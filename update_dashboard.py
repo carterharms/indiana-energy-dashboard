@@ -408,8 +408,8 @@ def research(client: anthropic.Anthropic) -> dict:
     for attempt in range(6):  # up to 6 continuation calls
         log(f"  API call {attempt + 1}…")
         response = client.messages.create(
-            model="claude-opus-4-7",
-            max_tokens=8000,
+            model="claude-sonnet-4-6",
+            max_tokens=6000,
             tools=tools,
             messages=messages,
         )
