@@ -1,0 +1,31 @@
+name: Update Dashboard
+
+on:
+  schedule:
+    - cron: '0 13 * * 1'   # Monday 8am Eastern
+    - cron: '0 13 * * 4'   # Thursday 8am Eastern
+  workflow_dispatch:         # lets you run it manually anytime
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - run: pip install anthropic
+
+      - run: python3 update_dashboard.py
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+      - name: Commit dashboard
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add dashboard.html
+          git diff --staged --quiet || git commit -m "Update dashboard"
+          git push
