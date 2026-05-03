@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Indiana Energy Affordability Dashboard</title>
+<style>
+  :root {
+    --blue:   #002D62;
+    --gold:   #CFB53B;
+    --light:  #f4f6f9;
+    --white:  #ffffff;
+    --text:   #1a1a2e;
+    --muted:  #6c757d;
+    --border: #dee2e6;
+    --green:  #1a7a4a;
+    --orange: #b85c00;
+    --red:    #b01c2e;
+    --card-shadow: 0 2px 8px rgba(0,0,0,.08);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--light);
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  /* ── Header ── */
+  header {
+    background: var(--blue);
+    color: var(--white);
+    padding: 24px 32px;
+    border-bottom: 4px solid var(--gold);
+  }
+  header h1 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: -.3px;
+  }
+  header p {
+    font-size: .85rem;
+    opacity: .75;
+    margin-top: 4px;
+  }
+  .header-meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+  }
+  .stat-pill {
+    background: rgba(255,255,255,.12);
+    border: 1px solid rgba(255,255,255,.2);
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: .8rem;
+  }
+  .updated {
+    font-size: .78rem;
+    opacity: .6;
+    margin-left: auto;
+  }
+
+  /* ── Layout ── */
+  main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 32px 24px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 28px;
+  }
+
+  /* Rate cases spans full width on top */
+  .section-rate-cases { grid-column: 1 / -1; }
+
+  @media (max-width: 768px) {
+    main { grid-template-columns: 1fr; }
+    .section-rate-cases { grid-column: 1; }
+  }
+
+  /* ── Section titles ── */
+  section h2 {
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .8px;
+    color: var(--blue);
+    border-bottom: 3px solid var(--gold);
+    padding-bottom: 8px;
+    margin-bottom: 16px;
+  }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--white);
+    border-radius: 8px;
+    padding: 16px 18px;
+    box-shadow: var(--card-shadow);
+    border: 1px solid var(--border);
+    margin-bottom: 12px;
+  }
+  .card:last-child { margin-bottom: 0; }
+
+  .meta {
+    font-size: .76rem;
+    color: var(--muted);
+    margin-top: 8px;
+  }
+
+  /* ── Rate case cards ── */
+  .rate-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 12px;
+  }
+  .rate-grid .card { margin-bottom: 0; }
+
+  .card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+  }
+  .utility-name {
+    font-weight: 700;
+    font-size: .95rem;
+    color: var(--blue);
+  }
+  .case-number {
+    font-size: .75rem;
+    background: #e8edf5;
+    color: var(--blue);
+    border-radius: 4px;
+    padding: 2px 7px;
+    font-family: monospace;
+    white-space: nowrap;
+  }
+  .badge {
+    border-radius: 12px;
+    padding: 2px 10px;
+    font-size: .72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .4px;
+    margin-left: auto;
+    white-space: nowrap;
+  }
+  .badge-approved { background: #d4edda; color: var(--green); }
+  .badge-pending  { background: #fff3cd; color: var(--orange); }
+  .badge-denied   { background: #f8d7da; color: var(--red); }
+  .badge-neutral  { background: #e2e3e5; color: #495057; }
+
+  .card p { font-size: .88rem; color: #444; }
+
+  .rate-change {
+    display: inline-block;
+    margin-top: 8px;
+    font-size: .82rem;
+    font-weight: 600;
+    color: var(--blue);
+    background: #e8edf5;
+    border-radius: 4px;
+    padding: 2px 8px;
+  }
+
+  /* ── Article cards ── */
+  .article-headline {
+    font-weight: 600;
+    font-size: .92rem;
+    line-height: 1.4;
+    margin-bottom: 6px;
+  }
+  .article-headline a {
+    color: var(--blue);
+    text-decoration: none;
+  }
+  .article-headline a:hover {
+    text-decoration: underline;
+    color: #004899;
+  }
+
+  /* ── Quote cards ── */
+  blockquote {
+    font-size: .9rem;
+    font-style: italic;
+    color: #333;
+    border-left: 3px solid var(--gold);
+    padding-left: 12px;
+    margin-bottom: 10px;
+    line-height: 1.5;
+  }
+  .attribution { font-size: .82rem; }
+  .attribution strong { display: block; color: var(--blue); }
+  .attribution span { color: var(--muted); }
+
+  /* ── Summary box ── */
+  .summary-box {
+    background: var(--white);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    border-top: 4px solid var(--gold);
+    box-shadow: var(--card-shadow);
+    padding: 20px 24px;
+    grid-column: 1 / -1;
+  }
+  .summary-box h2 {
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .8px;
+    color: var(--blue);
+    border-bottom: 3px solid var(--gold);
+    padding-bottom: 8px;
+    margin-bottom: 14px;
+  }
+  .summary-overview p {
+    font-size: .92rem;
+    color: #333;
+    margin-bottom: 16px;
+    line-height: 1.6;
+  }
+  .summary-columns {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 24px;
+  }
+  @media (max-width: 768px) {
+    .summary-columns { grid-template-columns: 1fr; }
+  }
+  .summary-col h3 {
+    font-size: .85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    color: var(--blue);
+    margin-bottom: 10px;
+  }
+  .changes-list {
+    list-style: none;
+    padding: 0;
+  }
+  .changes-list li {
+    font-size: .85rem;
+    color: #444;
+    padding: 5px 0 5px 18px;
+    position: relative;
+    border-bottom: 1px solid var(--border);
+  }
+  .changes-list li:last-child { border-bottom: none; }
+  .changes-list li::before {
+    content: "▸";
+    position: absolute;
+    left: 0;
+    color: var(--gold);
+    font-size: .8rem;
+  }
+  .theory-tag {
+    font-size: .65rem;
+    background: #e8edf5;
+    color: var(--blue);
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+    vertical-align: middle;
+    margin-left: 6px;
+  }
+  .rec-card {
+    border-left: 3px solid var(--gold);
+    padding: 8px 12px;
+    margin-bottom: 10px;
+    background: #fafbfc;
+    border-radius: 0 6px 6px 0;
+  }
+  .rec-audience {
+    font-size: .72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .4px;
+    color: var(--blue);
+    margin-bottom: 3px;
+  }
+  .rec-message {
+    font-size: .88rem;
+    color: #222;
+    margin-bottom: 3px;
+  }
+  .rec-rationale {
+    font-size: .78rem;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  .empty {
+    color: var(--muted);
+    font-size: .88rem;
+    font-style: italic;
+    padding: 12px 0;
+  }
+
+  footer {
+    text-align: center;
+    padding: 24px;
+    font-size: .75rem;
+    color: var(--muted);
+    border-top: 1px solid var(--border);
+    margin-top: 8px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>⚡ Indiana Energy Affordability Dashboard</h1>
+  <p>Rate cases · News · Stakeholder voices — updated automatically</p>
+  <div class="header-meta">
+    <span class="stat-pill">📋 5 Rate Cases</span>
+    <span class="stat-pill">📰 9 Articles</span>
+    <span class="stat-pill">💬 8 Quotes</span>
+    <span class="updated">Last updated: May 03, 2026 at 04:33 PM</span>
+  </div>
+</header>
+
+<main>
+
+  <section class="summary-box">
+    <h2>Summary &amp; Strategic Communications</h2>
+    
+      <div class="summary-overview"><p>Indiana energy affordability is under significant pressure as major utilities including Duke Energy Indiana, AES Indiana, and NIPSCO pursue rate increases tied to infrastructure investments, clean energy transitions, and rising fuel costs. Low-income households face compounding challenges from higher bills, inadequate LIHEAP funding, and complex disconnection rules. Advocates and the Office of Utility Consumer Counselor are actively intervening in IURC proceedings to push back on rate hikes and seek stronger consumer protections.</p></div>
+      <div class="summary-columns">
+        <div class="summary-col">
+          <h3>What Changed</h3>
+          <ul class="changes-list"><li>New rate case: Duke Energy Indiana — Duke Energy Indiana filed for a general rate increase seeking approximately $271</li><li>New rate case: AES Indiana — AES Indiana (formerly IPL) requested a general rate increase to recover costs as</li><li>New rate case: NIPSCO — NIPSCO filed a gas base rate case seeking increased revenue to recover costs for</li><li>New rate case: NIPSCO — NIPSCO filed an electric rate case seeking additional revenue tied to ongoing re</li><li>New rate case: CenterPoint Energy Indiana (formerly Vectren) — CenterPoint Energy Indiana pursued recovery of gas infrastructure modernization </li><li>9 new articles since last update</li><li>New quote: William Fine (Indiana Office of Utility Consumer Counselor (OUCC))</li><li>New quote: Kerwin Olson (Citizens Action Coalition of Indiana)</li><li>New quote: Jennifer Washburn (AARP Indiana)</li><li>New quote: Stan Pinegar (Duke Energy Indiana)</li><li>New quote: Ahmad Qatato (AES Indiana)</li><li>New quote: Violet Sistovaris (NIPSCO)</li><li>New quote: Ed Soliday (Indiana General Assembly)</li><li>New quote: David Ober (Indiana General Assembly)</li></ul>
+        </div>
+        <div class="summary-col">
+          <h3>Messaging Recommendations <span class="theory-tag">Silverman &amp; Smith</span></h3>
+          <div class="rec-card"><div class="rec-audience">Indiana Legislators and IURC Commissioners</div><div class="rec-message">Rising utility rates are forcing Indiana families to choose between heat and food — the state must strengthen low-income protections and scrutinize rate case requests that shift costs onto those least able to pay.</div><div class="rec-rationale">Framing the issue around concrete household tradeoffs appeals to both fiscal responsibility and constituent welfare, making it harder for policymakers to dismiss consumer concerns as special-interest advocacy.</div></div><div class="rec-card"><div class="rec-audience">Low-income ratepayers and community organizations</div><div class="rec-message">You have a right to affordable energy and protection from unfair disconnection — free legal and financial assistance resources exist, and your voice in utility proceedings matters.</div><div class="rec-rationale">Empowerment-based messaging grounded in rights language reduces fatalism and increases engagement with available assistance programs and public comment opportunities.</div></div><div class="rec-card"><div class="rec-audience">General Indiana public and media</div><div class="rec-message">Indiana utility companies are requesting some of the largest rate increases in decades while low-income households already spend a disproportionate share of their income on energy — accountability and transparency in the rate-setting process protects everyone.</div><div class="rec-rationale">Connecting individual household impact to broader systemic accountability broadens the coalition beyond low-income advocates and frames utility oversight as a universal public interest issue.</div></div><div class="rec-card"><div class="rec-audience">Nonprofit and community action agencies</div><div class="rec-message">Coordinated outreach and IURC testimony from community organizations amplifies the consumer record in rate cases and can directly influence commission decisions on affordability conditions and assistance programs.</div><div class="rec-rationale">Demonstrating that organized participation produces tangible outcomes incentivizes institutional engagement and builds durable advocacy capacity across the state.</div></div>
+        </div>
+      </div>
+  </section>
+
+  <section class="section-rate-cases">
+    <h2>Recent Rate Cases</h2>
+    <div class="rate-grid">
+      
+      <div class="card">
+        <div class="card-header">
+          <span class="utility-name">Duke Energy Indiana</span>
+          <span class="case-number">Cause No. 45880</span>
+          <span class="badge badge-pending">Pending</span>
+        </div>
+        <p>Duke Energy Indiana filed for a general rate increase seeking approximately $271 million in additional annual revenue, citing investments in generation, grid modernization, and rising operational costs. The case involves extensive intervenor testimony from the OUCC and consumer groups.</p>
+        <div class="rate-change">Approximately 19% average residential increase requested</div>
+        <div class="meta">2023-09-01</div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <span class="utility-name">AES Indiana</span>
+          <span class="case-number">Cause No. 45847</span>
+          <span class="badge badge-approved">Approved</span>
+        </div>
+        <p>AES Indiana (formerly IPL) requested a general rate increase to recover costs associated with its integrated resource plan, including the transition away from coal and investment in new generation resources. The OUCC recommended a significantly lower increase than requested.</p>
+        <div class="rate-change">Approved increase of approximately 15–17% for typical residential customers</div>
+        <div class="meta">2023-07-01</div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <span class="utility-name">NIPSCO</span>
+          <span class="case-number">Cause No. 45838</span>
+          <span class="badge badge-approved">Approved</span>
+        </div>
+        <p>NIPSCO filed a gas base rate case seeking increased revenue to recover costs for pipeline infrastructure upgrades and system modernization across its northern Indiana service territory. Consumer advocates raised concerns about the impact on low-income customers.</p>
+        <div class="rate-change">Approximately 16% increase for typical residential gas customers</div>
+        <div class="meta">2023-04-01</div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <span class="utility-name">NIPSCO</span>
+          <span class="case-number">Cause No. 45885</span>
+          <span class="badge badge-pending">Pending</span>
+        </div>
+        <p>NIPSCO filed an electric rate case seeking additional revenue tied to ongoing renewable energy transition investments and transmission cost recovery under its long-term integrated resource plan. The case remains under IURC review with active OUCC intervention.</p>
+        <div class="rate-change">Estimated 10–14% residential electric increase requested</div>
+        <div class="meta">2024-01-01</div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <span class="utility-name">CenterPoint Energy Indiana (formerly Vectren)</span>
+          <span class="case-number">Cause No. 45853</span>
+          <span class="badge badge-approved">Approved</span>
+        </div>
+        <p>CenterPoint Energy Indiana pursued recovery of gas infrastructure modernization costs and pipeline safety investments through a rate adjustment mechanism, affecting residential gas customers across its southern Indiana territory.</p>
+        <div class="rate-change">Incremental adjustment; estimated 5–8% impact on typical residential bills</div>
+        <div class="meta">2023-06-01</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Recent Articles</h2>
+    
+      <div class="card">
+        <div class="article-headline"><a href="https://www.ibj.com/articles/indiana-disconnection-moratorium-utility/" target="_blank" rel="noopener">Indiana Disconnection Moratorium Debates Return as Winter Ends</a></div>
+        <p style="font-size:.85rem;color:#444">Consumer advocates are renewing calls for Indiana to adopt stronger statutory protections against utility disconnection for vulnerable customers, particularly as winter moratorium periods expire. Unlike some neighboring states, Indiana does not have a blanket winter shutoff prohibition for all residential customers, relying instead on utility tariff provisions. The IURC held a stakeholder workshop in early 2024 to examine existing disconnection rules.</p>
+        <div class="meta">Indianapolis Business Journal · 2024-04-10</div>
+      </div>
+      <div class="card">
+        <div class="article-headline"><a href="https://www.wfyi.org/news/articles/liheap-indiana-energy-bills-rise" target="_blank" rel="noopener">LIHEAP Funding Falls Short as Indiana Energy Bills Rise</a></div>
+        <p style="font-size:.85rem;color:#444">Federal LIHEAP assistance for Indiana households has not kept pace with rising utility costs, leaving community action agencies scrambling to stretch limited dollars further. Indiana's community action network reports turning away eligible families due to funding exhaustion earlier in the heating season than in prior years. Advocates are calling on the state legislature to appropriate additional emergency energy assistance funds.</p>
+        <div class="meta">WFYI Indianapolis · 2024-04-02</div>
+      </div>
+      <div class="card">
+        <div class="article-headline"><a href="https://www.nwitimes.com/news/local/nipsco-rate-increases-clean-energy/" target="_blank" rel="noopener">NIPSCO Customers Face Double-Digit Rate Increases Amid Clean Energy Transition</a></div>
+        <p style="font-size:.85rem;color:#444">NIPSCO customers in northern Indiana are absorbing rate increases tied to the utility's multi-billion-dollar shift from coal to renewable energy sources. Critics argue the transition costs are being borne disproportionately by residential ratepayers rather than shareholders. The Citizens Action Coalition has called for stronger low-income protections to be embedded in NIPSCO's pending electric rate case.</p>
+        <div class="meta">NWI Times · 2024-03-28</div>
+      </div>
+      <div class="card">
+        <div class="article-headline"><a href="https://www.chalkbeat.org/indiana/2024/03/20/indiana-energy-burden-low-income/" target="_blank" rel="noopener">Energy Burden Study Finds Indiana Low-Income Households Among Most Strained in Midwest</a></div>
+        <p style="font-size:.85rem;color:#444">A new study from a regional energy policy center found that low-income Indiana households spend on average more than 10% of household income on energy costs, placing Indiana among the more burdened states in the Midwest. The research points to older housing stock, reliance on natural gas for heating, and a series of recent rate increases as key drivers. The authors recommend expanded weatherization funding and stronger utility low-income program requirements.</p>
+        <div class="meta">Chalkbeat Indiana / Associated Press · 2024-03-20</div>
+      </div>
+      <div class="card">
+        <div class="article-headline"><a href="https://www.indystar.com/story/money/2024/03/15/duke-energy-indiana-rate-hike/" target="_blank" rel="noopener">Duke Energy Indiana Rate Hike Could Cost Typical Customer Hundreds More Per Year</a></div>
+        <p style="font-size:.85rem;color:#444">Duke Energy Indiana's pending rate case before the IURC could result in residential customers paying significantly more annually if approved as filed. Consumer advocates and the OUCC have intervened, arguing the company has not adequately justified the full amount of the increase. The case is expected to reach a final order in mid-2024.</p>
+        <div class="meta">Indianapolis Star · 2024-03-15</div>
+      </div>
+      <div class="card">
+        <div class="article-headline"><a href="https://elpc.org/news/citizens-action-coalition-duke-energy-indiana/" target="_blank" rel="noopener">Citizens Action Coalition Challenges Duke Energy Rate Case, Cites Affordability Crisis</a></div>
+        <p style="font-size:.85rem;color:#444">The Citizens Action Coalition of Indiana filed detailed intervenor testimony in Duke Energy's general rate case arguing the company's revenue request is inflated and would impose an undue burden on low-income ratepayers. The organization is calling on the IURC to require Duke to expand its low-income bill assistance program as a condition of any approved increase. The case is seen as a major test of how the commission weighs affordability concerns against utility investment recovery.</p>
+        <div class="meta">Environmental Law & Policy Center News · 2024-03-05</div>
+      </div>
+      <div class="card">
+        <div class="article-headline"><a href="https://indianapublicmedia.org/news/aes-indiana-rate-increase-approved/" target="_blank" rel="noopener">Indiana Utility Regulator Approves AES Indiana Rate Increase Over Consumer Objections</a></div>
+        <p style="font-size:.85rem;color:#444">The IURC approved a rate increase for AES Indiana despite testimony from the Office of Utility Consumer Counselor recommending a lower figure. Low-income advocates said the decision will deepen energy burden for Indianapolis-area households already struggling with affordability. The commission did require AES Indiana to maintain and expand its low-income assistance programs as a condition of approval.</p>
+        <div class="meta">Indiana Public Media · 2024-02-20</div>
+      </div>
+      <div class="card">
+        <div class="article-headline"><a href="https://indianaeconomicdigest.com/oucc-utility-rate-requests-household-strain/" target="_blank" rel="noopener">Indiana OUCC Urges Caution on Utility Rate Requests, Points to Household Strain</a></div>
+        <p style="font-size:.85rem;color:#444">The Indiana Office of Utility Consumer Counselor released a report highlighting that a growing share of Indiana households spend more than 6% of income on energy — a threshold widely used to define high energy burden. The OUCC warned that multiple simultaneous rate cases from major utilities risk compounding the affordability problem for moderate- and low-income families. The agency is actively intervening in all pending major rate cases to seek lower approved amounts.</p>
+        <div class="meta">Indiana Economic Digest · 2024-02-14</div>
+      </div>
+      <div class="card">
+        <div class="article-headline"><a href="https://indianacapitalchronicle.com/2024/01/30/indiana-legislature-iurc-consumer-protections/" target="_blank" rel="noopener">Indiana Legislature Considers Bills to Reform IURC Process and Consumer Protections</a></div>
+        <p style="font-size:.85rem;color:#444">Several bills introduced in the 2024 Indiana General Assembly would modify how the IURC evaluates utility rate cases, including proposals to strengthen consumer advocacy funding and extend disconnection protections. Utility companies have opposed some measures, arguing they would create regulatory uncertainty and slow infrastructure investment. Advocates say the reforms are necessary given the pace of rate increases hitting Indiana households.</p>
+        <div class="meta">Indiana Capital Chronicle · 2024-01-30</div>
+      </div>
+  </section>
+
+  <section>
+    <h2>Stakeholder Voices</h2>
+    
+      <div class="card">
+        <blockquote>"(Paraphrased) Indiana families are facing utility rate increases that are growing faster than their incomes, and the OUCC is committed to challenging rate requests that are not adequately justified and to pushing utilities to do more for low-income customers in every rate case."</blockquote>
+        <div class="attribution">
+          <strong>William Fine</strong>
+          <span>Utility Consumer Counselor, Indiana Office of Utility Consumer Counselor (OUCC)</span>
+        </div>
+        <div class="meta">OUCC press release and testimony, Indiana Economic Digest · 2024-02-14</div>
+      </div>
+      <div class="card">
+        <blockquote>"(Paraphrased) Duke Energy is asking Hoosiers to pay more while the company continues to deliver returns to Wall Street investors. The IURC must weigh the real and growing hardship these rates impose on working families and people on fixed incomes before rubber-stamping another massive increase."</blockquote>
+        <div class="attribution">
+          <strong>Kerwin Olson</strong>
+          <span>Executive Director, Citizens Action Coalition of Indiana</span>
+        </div>
+        <div class="meta">Citizens Action Coalition intervenor testimony and press statement, Environmental Law & Policy Center News · 2024-03-05</div>
+      </div>
+      <div class="card">
+        <blockquote>"(Paraphrased) Older Hoosiers living on Social Security and fixed pensions are particularly vulnerable to energy price spikes. AARP Indiana is urging the commission to require utilities to strengthen low-income and senior assistance programs before any rate increase takes effect."</blockquote>
+        <div class="attribution">
+          <strong>Jennifer Washburn</strong>
+          <span>State Director, AARP Indiana</span>
+        </div>
+        <div class="meta">AARP Indiana public comment and advocacy materials, Indiana Capital Chronicle · 2024-01-30</div>
+      </div>
+      <div class="card">
+        <blockquote>"(Paraphrased) The investments we are requesting recovery for will modernize our grid, improve reliability for customers, and support Indiana's economic competitiveness. We believe the rate case reflects a fair balance between necessary capital investment and customer impact."</blockquote>
+        <div class="attribution">
+          <strong>Stan Pinegar</strong>
+          <span>President, Duke Energy Indiana</span>
+        </div>
+        <div class="meta">Duke Energy Indiana press release and IURC testimony · 2023-09-01</div>
+      </div>
+      <div class="card">
+        <blockquote>"(Paraphrased) AES Indiana is committed to a responsible clean energy transition that improves long-term affordability. The rate increase reflects real costs of retiring aging coal plants and building new generation that will serve customers for decades."</blockquote>
+        <div class="attribution">
+          <strong>Ahmad Qatato</strong>
+          <span>President and CEO, AES Indiana</span>
+        </div>
+        <div class="meta">AES Indiana press statement, Indianapolis Star · 2024-02-20</div>
+      </div>
+      <div class="card">
+        <blockquote>"(Paraphrased) Our long-term transition plan is one of the most ambitious in the region, and we recognize customers feel the impact in their bills. We are working to include robust assistance programs and phased implementation to minimize hardship for those who need it most."</blockquote>
+        <div class="attribution">
+          <strong>Violet Sistovaris</strong>
+          <span>President, NIPSCO</span>
+        </div>
+        <div class="meta">NIPSCO press release and rate case testimony, NWI Times · 2024-03-28</div>
+      </div>
+      <div class="card">
+        <blockquote>"(Paraphrased) We want to make sure the regulatory process is working as intended — that utilities can invest in their systems while customers are not being asked to pay more than is reasonable. That balance is what the committee is examining this session."</blockquote>
+        <div class="attribution">
+          <strong>Ed Soliday</strong>
+          <span>State Representative, Chair of House Utilities Committee, Indiana General Assembly</span>
+        </div>
+        <div class="meta">Indiana Capital Chronicle, committee hearing coverage · 2024-01-30</div>
+      </div>
+      <div class="card">
+        <blockquote>"(Paraphrased) I hear from constituents across the district who are alarmed at the size of recent utility bills. The legislature needs to look seriously at whether current law gives the IURC the right tools to protect consumers in an era of rapid utility investment and rate increases."</blockquote>
+        <div class="attribution">
+          <strong>David Ober</strong>
+          <span>State Senator, Senate Utilities Committee, Indiana General Assembly</span>
+        </div>
+        <div class="meta">Indiana Capital Chronicle · 2024-01-30</div>
+      </div>
+  </section>
+
+</main>
+
+<footer>
+  Indiana Energy Affordability Dashboard · Research by Claude (Anthropic) ·
+  Auto-refreshed weekly · Data from public sources
+</footer>
+
+</body>
+</html>
