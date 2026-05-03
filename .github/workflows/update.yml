@@ -19,7 +19,7 @@ jobs:
         with:
           python-version: '3.12'
 
-      - run: pip install anthropic
+      - run: pip install anthropic duckduckgo-search
 
       - run: python3 update_dashboard.py
         env:
@@ -30,6 +30,6 @@ jobs:
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           git pull --rebase origin main
-          git add dashboard.html
+          git add dashboard.html previous_data.json
           git diff --staged --quiet || git commit -m "Update dashboard"
           git push
