@@ -14,17 +14,19 @@ from datetime import datetime
 from pathlib import Path
 
 import anthropic
+from duckduckgo_search import DDGS
 
 SCRIPT_DIR = Path(__file__).parent
-DASHBOARD_PATH = SCRIPT_DIR / "dashboard.html"
-LOG_PATH = SCRIPT_DIR / "update.log"
+DASHBOARD_PATH    = SCRIPT_DIR / "dashboard.html"
+LOG_PATH          = SCRIPT_DIR / "update.log"
+PREV_DATA_PATH    = SCRIPT_DIR / "previous_data.json"
 
 # ── Research prompt ────────────────────────────────────────────────────────────
 
 RESEARCH_PROMPT = """
 You are a policy researcher specializing in Indiana energy affordability.
-Search the web thoroughly and gather current, accurate information on the
-three topics below. Use multiple searches per topic.
+Below are live web search results on four topics. Extract and summarize the
+most relevant, accurate information from these results.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 TOPIC 1 — RECENT RATE CASES (last 12 months)
@@ -84,12 +86,31 @@ For each quote include:
   - date: when it was said or published
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TOPIC 4 — STRATEGIC COMMUNICATIONS SUMMARY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Based on the search results above, apply Silverman and Smith's principles of
+strategic communication to recommend 3–4 messaging strategies for advocates
+working on Indiana energy affordability. For each recommendation include:
+  - audience: the target audience (e.g. "Low-income ratepayers", "Legislators")
+  - message: the core message (1–2 sentences)
+  - rationale: why this message works strategically (1 sentence)
+
+Also write a 2–3 sentence plain-language overview of the current Indiana
+energy affordability landscape based on the search results.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 OUTPUT FORMAT
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Return ONLY a valid JSON object — no text before or after it.
-Use this exact structure:
+Use this exact structure. Use YYYY-MM-DD format for all dates.
 
 {
+  "summary": {
+    "overview": "",
+    "messaging_recommendations": [
+      {"audience": "", "message": "", "rationale": ""}
+    ]
+  },
   "rate_cases": [
     {
       "utility": "",
@@ -121,7 +142,7 @@ Use this exact structure:
   ]
 }
 
-Search thoroughly. Only include real, verifiable information.
+Only include real, verifiable information from the search results provided.
 """
 
 # ── HTML template ──────────────────────────────────────────────────────────────
@@ -328,6 +349,105 @@ HTML_TEMPLATE = """<!DOCTYPE html>
   .attribution strong {{ display: block; color: var(--blue); }}
   .attribution span {{ color: var(--muted); }}
 
+  /* ── Summary box ── */
+  .summary-box {{
+    background: var(--white);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    border-top: 4px solid var(--gold);
+    box-shadow: var(--card-shadow);
+    padding: 20px 24px;
+    grid-column: 1 / -1;
+  }}
+  .summary-box h2 {{
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .8px;
+    color: var(--blue);
+    border-bottom: 3px solid var(--gold);
+    padding-bottom: 8px;
+    margin-bottom: 14px;
+  }}
+  .summary-overview p {{
+    font-size: .92rem;
+    color: #333;
+    margin-bottom: 16px;
+    line-height: 1.6;
+  }}
+  .summary-columns {{
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 24px;
+  }}
+  @media (max-width: 768px) {{
+    .summary-columns {{ grid-template-columns: 1fr; }}
+  }}
+  .summary-col h3 {{
+    font-size: .85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    color: var(--blue);
+    margin-bottom: 10px;
+  }}
+  .changes-list {{
+    list-style: none;
+    padding: 0;
+  }}
+  .changes-list li {{
+    font-size: .85rem;
+    color: #444;
+    padding: 5px 0 5px 18px;
+    position: relative;
+    border-bottom: 1px solid var(--border);
+  }}
+  .changes-list li:last-child {{ border-bottom: none; }}
+  .changes-list li::before {{
+    content: "▸";
+    position: absolute;
+    left: 0;
+    color: var(--gold);
+    font-size: .8rem;
+  }}
+  .theory-tag {{
+    font-size: .65rem;
+    background: #e8edf5;
+    color: var(--blue);
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+    vertical-align: middle;
+    margin-left: 6px;
+  }}
+  .rec-card {{
+    border-left: 3px solid var(--gold);
+    padding: 8px 12px;
+    margin-bottom: 10px;
+    background: #fafbfc;
+    border-radius: 0 6px 6px 0;
+  }}
+  .rec-audience {{
+    font-size: .72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .4px;
+    color: var(--blue);
+    margin-bottom: 3px;
+  }}
+  .rec-message {{
+    font-size: .88rem;
+    color: #222;
+    margin-bottom: 3px;
+  }}
+  .rec-rationale {{
+    font-size: .78rem;
+    color: var(--muted);
+    font-style: italic;
+  }}
+
   .empty {{
     color: var(--muted);
     font-size: .88rem;
@@ -359,6 +479,11 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 </header>
 
 <main>
+
+  <section class="summary-box">
+    <h2>Summary &amp; Strategic Communications</h2>
+    {summary_html}
+  </section>
 
   <section class="section-rate-cases">
     <h2>Recent Rate Cases</h2>
@@ -398,66 +523,102 @@ def log(msg: str) -> None:
         f.write(line + "\n")
 
 
+def load_previous_data() -> dict:
+    if PREV_DATA_PATH.exists():
+        try:
+            return json.loads(PREV_DATA_PATH.read_text(encoding="utf-8"))
+        except Exception:
+            pass
+    return {}
+
+
+def compute_changes(prev: dict, curr: dict) -> list[str]:
+    changes = []
+
+    prev_cases = {f"{c.get('utility','')}|{c.get('case_number','')}": c for c in prev.get("rate_cases", [])}
+    for c in curr.get("rate_cases", []):
+        key = f"{c.get('utility','')}|{c.get('case_number','')}"
+        if key not in prev_cases:
+            changes.append(f"New rate case: {c.get('utility','')} — {c.get('description','')[:80]}")
+        elif prev_cases[key].get("status") != c.get("status"):
+            changes.append(f"Status change: {c.get('utility','')} case now {c.get('status','')}")
+
+    prev_headlines = {a.get("headline","") for a in prev.get("articles", [])}
+    new_articles = [a for a in curr.get("articles", []) if a.get("headline","") not in prev_headlines]
+    if new_articles:
+        changes.append(f"{len(new_articles)} new article{'s' if len(new_articles) != 1 else ''} since last update")
+
+    prev_quotes = {f"{s.get('name','')}|{s.get('date','')}": True for s in prev.get("stakeholders", [])}
+    for s in curr.get("stakeholders", []):
+        key = f"{s.get('name','')}|{s.get('date','')}"
+        if key not in prev_quotes:
+            changes.append(f"New quote: {s.get('name','')} ({s.get('organization','')})")
+
+    return changes if changes else ["No significant changes detected since last update"]
+
+
+SEARCH_QUERIES = [
+    "Indiana utility rate case IURC 2025",
+    "Duke Energy Indiana AES Indiana NIPSCO rate increase 2025",
+    "Indiana energy affordability low income assistance 2025",
+    "Indiana utility disconnection LIHEAP 2025",
+    "IURC Indiana Utility Regulatory Commission decision 2025",
+    "Citizens Action Coalition Indiana energy 2025",
+    "Indiana energy policy legislation 2025",
+]
+
+
+def web_search(queries: list[str]) -> str:
+    """Run DuckDuckGo searches and return combined results as text."""
+    ddgs = DDGS()
+    all_results = []
+    for query in queries:
+        log(f"  Searching: {query}")
+        try:
+            results = ddgs.text(query, max_results=5)
+            for r in results:
+                all_results.append(f"HEADLINE: {r.get('title','')}\nSOURCE: {r.get('href','')}\nSNIPPET: {r.get('body','')}\n")
+        except Exception as exc:
+            log(f"  Search error for '{query}': {exc}")
+        time.sleep(1)
+    return "\n---\n".join(all_results)
+
+
 def research(client: anthropic.Anthropic) -> dict:
-    """Run the research loop — handles server-side tool pagination."""
-    tools = [
-        {"type": "web_search_20260209", "name": "web_search"},
-    ]
-    messages = [{"role": "user", "content": RESEARCH_PROMPT}]
+    """Search the web then ask Claude to format results as dashboard JSON."""
+    log("  Running web searches…")
+    search_results = web_search(SEARCH_QUERIES)
+    log(f"  Got {len(search_results)} chars of search data")
 
-    # Create a container upfront for server-side tool calls
-    container_id = None
-    try:
-        container = client.beta.containers.create()
-        container_id = container.id
-        log(f"  Container created: {container_id[:16]}…")
-    except Exception as exc:
-        log(f"  Container creation skipped: {exc}")
+    prompt = RESEARCH_PROMPT + f"\n\nSEARCH RESULTS:\n{search_results[:12000]}"
 
-    for attempt in range(6):
-        log(f"  API call {attempt + 1}…")
-        kwargs = dict(
-            model="claude-sonnet-4-6",
-            max_tokens=6000,
-            tools=tools,
-            messages=messages,
-        )
-        if container_id:
-            kwargs["container_id"] = container_id
+    for retry in range(5):
+        log(f"  Calling Claude (attempt {retry + 1})…")
+        try:
+            response = client.messages.create(
+                model="claude-sonnet-4-6",
+                max_tokens=4000,
+                messages=[{"role": "user", "content": prompt}],
+            )
+            break
+        except anthropic.RateLimitError:
+            wait = 65 * (retry + 1)
+            log(f"  Rate limit hit — waiting {wait}s…")
+            time.sleep(wait)
+    else:
+        raise RuntimeError("Rate limit retries exhausted.")
 
-        for retry in range(5):
-            try:
-                response = client.messages.create(**kwargs)
-                break
-            except anthropic.RateLimitError:
-                wait = 65 * (retry + 1)
-                log(f"  Rate limit hit — waiting {wait}s before retry {retry + 1}/5…")
-                time.sleep(wait)
-        else:
-            raise RuntimeError("Rate limit retries exhausted.")
-
-        log(f"  stop_reason={response.stop_reason}")
-
-        if response.stop_reason == "end_turn":
-            for block in response.content:
-                if hasattr(block, "text"):
-                    text = block.text.strip()
-                    start = text.find("{")
-                    end   = text.rfind("}") + 1
-                    if start != -1 and end > start:
-                        try:
-                            return json.loads(text[start:end])
-                        except json.JSONDecodeError as exc:
-                            raise ValueError(f"JSON parse error: {exc}\n\n{text[start:end][:600]}")
-            raise ValueError("Response ended but contained no JSON.")
-
-        if response.stop_reason == "pause_turn":
-            messages.append({"role": "assistant", "content": response.content})
-            continue
-
-        raise ValueError(f"Unexpected stop_reason: {response.stop_reason!r}")
-
-    raise RuntimeError("Exceeded max continuation attempts without a final response.")
+    for block in response.content:
+        if hasattr(block, "text"):
+            text = block.text.strip()
+            start = text.find("{")
+            end   = text.rfind("}") + 1
+            if start != -1 and end > start:
+                try:
+                    return json.loads(text[start:end])
+                except json.JSONDecodeError as exc:
+                    raise ValueError(f"JSON parse error: {exc}\n\n{text[start:end][:600]}")
+    raise ValueError("Response ended but contained no JSON.")
 
 
 # ── HTML builder ───────────────────────────────────────────────────────────────
@@ -473,7 +634,36 @@ def _badge(status: str) -> str:
     return "badge-neutral"
 
 
-def build_html(data: dict, updated_at: str) -> str:
+def build_html(data: dict, updated_at: str, changes: list[str] | None = None) -> str:
+    # ── Summary box ──
+    summary     = data.get("summary", {})
+    overview    = summary.get("overview", "")
+    recs        = summary.get("messaging_recommendations", [])
+    changes     = changes or []
+
+    changes_html = "".join(f"<li>{c}</li>" for c in changes)
+    recs_html    = "".join(
+        f'<div class="rec-card">'
+        f'<div class="rec-audience">{r.get("audience","")}</div>'
+        f'<div class="rec-message">{r.get("message","")}</div>'
+        f'<div class="rec-rationale">{r.get("rationale","")}</div>'
+        f'</div>'
+        for r in recs
+    )
+
+    summary_html = f"""
+      <div class="summary-overview"><p>{overview}</p></div>
+      <div class="summary-columns">
+        <div class="summary-col">
+          <h3>What Changed</h3>
+          <ul class="changes-list">{changes_html}</ul>
+        </div>
+        <div class="summary-col">
+          <h3>Messaging Recommendations <span class="theory-tag">Silverman &amp; Smith</span></h3>
+          {recs_html}
+        </div>
+      </div>"""
+
     # ── Rate cases ──
     rate_cases_html = ""
     for case in data.get("rate_cases", []):
@@ -498,9 +688,14 @@ def build_html(data: dict, updated_at: str) -> str:
     if not rate_cases_html:
         rate_cases_html = '<p class="empty">No recent rate cases found.</p>'
 
-    # ── Articles ──
+    # ── Articles (sorted newest first) ──
     articles_html = ""
-    for art in data.get("articles", []):
+    sorted_articles = sorted(
+        data.get("articles", []),
+        key=lambda a: a.get("date", ""),
+        reverse=True,
+    )
+    for art in sorted_articles:
         url  = art.get("url", "")
         link = (f'<a href="{url}" target="_blank" rel="noopener">'
                 f'{art.get("headline","")}</a>'
@@ -533,6 +728,7 @@ def build_html(data: dict, updated_at: str) -> str:
 
     return HTML_TEMPLATE.format(
         updated_at=updated_at,
+        summary_html=summary_html,
         rate_cases_html=rate_cases_html,
         articles_html=articles_html,
         stakeholders_html=stakeholders_html,
@@ -548,6 +744,8 @@ def main() -> None:
     log("━━━ Dashboard update started ━━━")
     client = anthropic.Anthropic()
 
+    prev_data = load_previous_data()
+
     log("Researching rate cases, articles, and stakeholder quotes…")
     try:
         data = research(client)
@@ -562,10 +760,16 @@ def main() -> None:
         f"{len(data.get('stakeholders', []))} quotes"
     )
 
+    changes = compute_changes(prev_data, data)
+    log(f"Changes detected: {len(changes)}")
+
     updated_at = datetime.now().strftime("%B %d, %Y at %I:%M %p")
-    html = build_html(data, updated_at)
+    html = build_html(data, updated_at, changes)
     DASHBOARD_PATH.write_text(html, encoding="utf-8")
     log(f"Dashboard written → {DASHBOARD_PATH}")
+
+    PREV_DATA_PATH.write_text(json.dumps(data, indent=2), encoding="utf-8")
+    log(f"Previous data saved → {PREV_DATA_PATH}")
     log("━━━ Done ━━━")
 
 
