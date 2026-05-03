@@ -9,7 +9,6 @@ Requires: ANTHROPIC_API_KEY environment variable
 
 import json
 import sys
-import time
 from datetime import datetime
 from pathlib import Path
 
@@ -402,43 +401,18 @@ def research(client: anthropic.Anthropic) -> dict:
     """Run the research loop — handles server-side tool pagination."""
     tools = [
         {"type": "web_search_20260209", "name": "web_search"},
+        {"type": "web_fetch_20260209",  "name": "web_fetch"},
     ]
     messages = [{"role": "user", "content": RESEARCH_PROMPT}]
-    container_id = None
 
     for attempt in range(6):  # up to 6 continuation calls
         log(f"  API call {attempt + 1}…")
-        kwargs = dict(
+        response = client.messages.create(
             model="claude-sonnet-4-6",
             max_tokens=6000,
             tools=tools,
             messages=messages,
         )
-        if container_id:
-            kwargs["container_id"] = container_id
-
-        for retry in range(5):
-            try:
-                response = client.messages.create(**kwargs)
-                break
-            except anthropic.RateLimitError:
-                wait = 65 * (retry + 1)
-                log(f"  Rate limit hit — waiting {wait}s before retry {retry + 1}/5…")
-                time.sleep(wait)
-        else:
-            raise RuntimeError("Rate limit retries exhausted.")
-
-        # Debug: show response fields to locate container_id
-        try:
-            extra = getattr(response, "model_extra", {}) or {}
-            log(f"  Debug stop_reason={response.stop_reason} container_id_attr={getattr(response, 'container_id', 'MISSING')} extra_keys={list(extra.keys())}")
-        except Exception as dbg_err:
-            log(f"  Debug error: {dbg_err}")
-
-        if getattr(response, "container_id", None):
-            container_id = response.container_id
-        elif (getattr(response, "model_extra", None) or {}).get("container_id"):
-            container_id = response.model_extra["container_id"]
 
         if response.stop_reason == "end_turn":
             # Extract the JSON block from the final text response
