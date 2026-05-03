@@ -428,8 +428,17 @@ def research(client: anthropic.Anthropic) -> dict:
         else:
             raise RuntimeError("Rate limit retries exhausted.")
 
-        if hasattr(response, "container_id") and response.container_id:
+        # Debug: show response fields to locate container_id
+        try:
+            extra = getattr(response, "model_extra", {}) or {}
+            log(f"  Debug stop_reason={response.stop_reason} container_id_attr={getattr(response, 'container_id', 'MISSING')} extra_keys={list(extra.keys())}")
+        except Exception as dbg_err:
+            log(f"  Debug error: {dbg_err}")
+
+        if getattr(response, "container_id", None):
             container_id = response.container_id
+        elif (getattr(response, "model_extra", None) or {}).get("container_id"):
+            container_id = response.model_extra["container_id"]
 
         if response.stop_reason == "end_turn":
             # Extract the JSON block from the final text response
