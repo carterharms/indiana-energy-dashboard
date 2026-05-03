@@ -402,7 +402,6 @@ def research(client: anthropic.Anthropic) -> dict:
     """Run the research loop — handles server-side tool pagination."""
     tools = [
         {"type": "web_search_20260209", "name": "web_search"},
-        {"type": "web_fetch_20260209",  "name": "web_fetch"},
     ]
     messages = [{"role": "user", "content": RESEARCH_PROMPT}]
     container_id = None
