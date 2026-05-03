@@ -9,6 +9,7 @@ Requires: ANTHROPIC_API_KEY environment variable
 
 import json
 import sys
+import time
 from datetime import datetime
 from pathlib import Path
 
@@ -401,21 +402,43 @@ def research(client: anthropic.Anthropic) -> dict:
     """Run the research loop — handles server-side tool pagination."""
     tools = [
         {"type": "web_search_20260209", "name": "web_search"},
-        {"type": "web_fetch_20260209",  "name": "web_fetch"},
     ]
     messages = [{"role": "user", "content": RESEARCH_PROMPT}]
 
-    for attempt in range(6):  # up to 6 continuation calls
+    # Create a container upfront for server-side tool calls
+    container_id = None
+    try:
+        container = client.beta.containers.create()
+        container_id = container.id
+        log(f"  Container created: {container_id[:16]}…")
+    except Exception as exc:
+        log(f"  Container creation skipped: {exc}")
+
+    for attempt in range(6):
         log(f"  API call {attempt + 1}…")
-        response = client.messages.create(
+        kwargs = dict(
             model="claude-sonnet-4-6",
             max_tokens=6000,
             tools=tools,
             messages=messages,
         )
+        if container_id:
+            kwargs["container_id"] = container_id
+
+        for retry in range(5):
+            try:
+                response = client.messages.create(**kwargs)
+                break
+            except anthropic.RateLimitError:
+                wait = 65 * (retry + 1)
+                log(f"  Rate limit hit — waiting {wait}s before retry {retry + 1}/5…")
+                time.sleep(wait)
+        else:
+            raise RuntimeError("Rate limit retries exhausted.")
+
+        log(f"  stop_reason={response.stop_reason}")
 
         if response.stop_reason == "end_turn":
-            # Extract the JSON block from the final text response
             for block in response.content:
                 if hasattr(block, "text"):
                     text = block.text.strip()
@@ -429,7 +452,6 @@ def research(client: anthropic.Anthropic) -> dict:
             raise ValueError("Response ended but contained no JSON.")
 
         if response.stop_reason == "pause_turn":
-            # Server-side tools hit their iteration cap — append and continue.
             messages.append({"role": "assistant", "content": response.content})
             continue
 
