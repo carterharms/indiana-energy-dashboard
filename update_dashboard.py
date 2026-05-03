@@ -404,16 +404,23 @@ def research(client: anthropic.Anthropic) -> dict:
         {"type": "web_fetch_20260209",  "name": "web_fetch"},
     ]
     messages = [{"role": "user", "content": RESEARCH_PROMPT}]
+      container_id = None
 
     for attempt in range(6):  # up to 6 continuation calls
         log(f"  API call {attempt + 1}…")
-        response = client.messages.create(
+     kwargs = dict(
             model="claude-sonnet-4-6",
             max_tokens=6000,
             tools=tools,
             messages=messages,
         )
+ if container_id:
+            kwargs["container_id"] = container_id
 
+ response = client.messages.create(**kwargs)
+
+        if hasattr(response, "container_id") and response.container_id:
+            container_id = response.container_id
         if response.stop_reason == "end_turn":
             # Extract the JSON block from the final text response
             for block in response.content:
