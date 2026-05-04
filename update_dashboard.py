@@ -618,6 +618,14 @@ def research(client: anthropic.Anthropic) -> dict:
             raise ValueError("No JSON in end_turn response.")
 
         if response.stop_reason == "pause_turn":
+            for block in response.content:
+                btype = getattr(block, "type", "unknown")
+                bid   = getattr(block, "id", None)
+                extra = getattr(block, "model_extra", {}) or {}
+                log(f"  pause_turn block: type={btype} id={bid} extra_keys={list(extra.keys())}")
+                if not container_id and bid:
+                    container_id = bid
+                    log(f"  container_id set from block id: {container_id[:20]}…")
             messages.append({"role": "assistant", "content": response.content})
             continue
 
