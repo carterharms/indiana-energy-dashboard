@@ -23,10 +23,11 @@ PREV_DATA_PATH    = SCRIPT_DIR / "previous_data.json"
 # ── Research prompt ────────────────────────────────────────────────────────────
 
 RESEARCH_PROMPT = """
-You are a policy researcher specializing in Indiana energy affordability.
-Search the web thoroughly and gather current, accurate information on the
-four topics below. Use multiple targeted searches per topic to find the
-most recent information available.
+Today's date is {today}. You are a policy researcher specializing in Indiana
+energy affordability. You MUST use the web_search tool to find current
+information — do NOT rely on training data. Search specifically for content
+from 2025 and 2026. Use multiple targeted searches per topic, including the
+year 2026 in your search queries.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 TOPIC 1 — RECENT RATE CASES (last 12 months)
@@ -93,7 +94,6 @@ strategic communication to recommend 3–4 messaging strategies for advocates
 working on Indiana energy affordability. For each recommendation include:
   - audience: the target audience (e.g. "Low-income ratepayers", "Legislators")
   - message: the core message (1–2 sentences)
-  - rationale: why this message works strategically (1 sentence)
 
 Also write a 2–3 sentence plain-language overview of the current Indiana
 energy affordability landscape based on the search results.
@@ -108,7 +108,7 @@ Use this exact structure. Use YYYY-MM-DD format for all dates.
   "summary": {
     "overview": "",
     "messaging_recommendations": [
-      {"audience": "", "message": "", "rationale": ""}
+      {"audience": "", "message": ""}
     ]
   },
   "rate_cases": [
@@ -560,7 +560,8 @@ def compute_changes(prev: dict, curr: dict) -> list[str]:
 def research(client: anthropic.Anthropic) -> dict:
     """Use Anthropic server-side web search for live, high-quality results."""
     tools    = [{"type": "web_search_20260209", "name": "web_search"}]
-    messages = [{"role": "user", "content": RESEARCH_PROMPT}]
+    today    = datetime.now().strftime("%B %d, %Y")
+    messages = [{"role": "user", "content": RESEARCH_PROMPT.replace("{today}", today)}]
     container_id = None
 
     for attempt in range(8):
@@ -659,7 +660,6 @@ def build_html(data: dict, updated_at: str, changes: list[str] | None = None) ->
         f'<div class="rec-card">'
         f'<div class="rec-audience">{r.get("audience","")}</div>'
         f'<div class="rec-message">{r.get("message","")}</div>'
-        f'<div class="rec-rationale">{r.get("rationale","")}</div>'
         f'</div>'
         for r in recs
     )
