@@ -14,7 +14,6 @@ from datetime import datetime
 from pathlib import Path
 
 import anthropic
-from duckduckgo_search import DDGS
 
 SCRIPT_DIR = Path(__file__).parent
 DASHBOARD_PATH    = SCRIPT_DIR / "dashboard.html"
@@ -25,8 +24,9 @@ PREV_DATA_PATH    = SCRIPT_DIR / "previous_data.json"
 
 RESEARCH_PROMPT = """
 You are a policy researcher specializing in Indiana energy affordability.
-Below are live web search results on four topics. Extract and summarize the
-most relevant, accurate information from these results.
+Search the web thoroughly and gather current, accurate information on the
+four topics below. Use multiple targeted searches per topic to find the
+most recent information available.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 TOPIC 1 — RECENT RATE CASES (last 12 months)
@@ -557,68 +557,73 @@ def compute_changes(prev: dict, curr: dict) -> list[str]:
     return changes if changes else ["No significant changes detected since last update"]
 
 
-SEARCH_QUERIES = [
-    "Indiana utility rate case IURC 2025",
-    "Duke Energy Indiana AES Indiana NIPSCO rate increase 2025",
-    "Indiana energy affordability low income assistance 2025",
-    "Indiana utility disconnection LIHEAP 2025",
-    "IURC Indiana Utility Regulatory Commission decision 2025",
-    "Citizens Action Coalition Indiana energy 2025",
-    "Indiana energy policy legislation 2025",
-]
-
-
-def web_search(queries: list[str]) -> str:
-    """Run DuckDuckGo searches and return combined results as text."""
-    ddgs = DDGS()
-    all_results = []
-    for query in queries:
-        log(f"  Searching: {query}")
-        try:
-            results = ddgs.text(query, max_results=5)
-            for r in results:
-                all_results.append(f"HEADLINE: {r.get('title','')}\nSOURCE: {r.get('href','')}\nSNIPPET: {r.get('body','')}\n")
-        except Exception as exc:
-            log(f"  Search error for '{query}': {exc}")
-        time.sleep(1)
-    return "\n---\n".join(all_results)
-
-
 def research(client: anthropic.Anthropic) -> dict:
-    """Search the web then ask Claude to format results as dashboard JSON."""
-    log("  Running web searches…")
-    search_results = web_search(SEARCH_QUERIES)
-    log(f"  Got {len(search_results)} chars of search data")
+    """Use Anthropic server-side web search for live, high-quality results."""
+    tools    = [{"type": "web_search_20260209", "name": "web_search"}]
+    messages = [{"role": "user", "content": RESEARCH_PROMPT}]
+    container_id = None
 
-    prompt = RESEARCH_PROMPT + f"\n\nSEARCH RESULTS:\n{search_results[:12000]}"
+    for attempt in range(8):
+        log(f"  API call {attempt + 1}…")
+        kwargs = dict(
+            model="claude-sonnet-4-6",
+            max_tokens=8000,
+            tools=tools,
+            messages=messages,
+        )
+        if container_id:
+            kwargs["container_id"] = container_id
 
-    for retry in range(5):
-        log(f"  Calling Claude (attempt {retry + 1})…")
-        try:
-            response = client.messages.create(
-                model="claude-sonnet-4-6",
-                max_tokens=4000,
-                messages=[{"role": "user", "content": prompt}],
-            )
-            break
-        except anthropic.RateLimitError:
-            wait = 65 * (retry + 1)
-            log(f"  Rate limit hit — waiting {wait}s…")
-            time.sleep(wait)
-    else:
-        raise RuntimeError("Rate limit retries exhausted.")
+        for retry in range(5):
+            try:
+                raw      = client.messages.with_raw_response.create(**kwargs)
+                response = raw.parse()
+                break
+            except anthropic.RateLimitError:
+                wait = 65 * (retry + 1)
+                log(f"  Rate limit — waiting {wait}s…")
+                time.sleep(wait)
+        else:
+            raise RuntimeError("Rate limit retries exhausted.")
 
-    for block in response.content:
-        if hasattr(block, "text"):
-            text = block.text.strip()
-            start = text.find("{")
-            end   = text.rfind("}") + 1
-            if start != -1 and end > start:
-                try:
-                    return json.loads(text[start:end])
-                except json.JSONDecodeError as exc:
-                    raise ValueError(f"JSON parse error: {exc}\n\n{text[start:end][:600]}")
-    raise ValueError("Response ended but contained no JSON.")
+        if not container_id:
+            for h in ["x-container-id", "container-id", "x-session-id"]:
+                val = raw.headers.get(h)
+                if val:
+                    container_id = val
+                    log(f"  container_id captured from header '{h}'")
+                    break
+            if not container_id:
+                cid = getattr(response, "container_id", None) or \
+                      (getattr(response, "model_extra", None) or {}).get("container_id")
+                if cid:
+                    container_id = cid
+                    log(f"  container_id captured from response body")
+            if not container_id:
+                log(f"  Note: no container_id found (headers: {list(raw.headers.keys())})")
+
+        log(f"  stop_reason={response.stop_reason} container={'set' if container_id else 'unset'}")
+
+        if response.stop_reason == "end_turn":
+            for block in response.content:
+                if hasattr(block, "text"):
+                    text  = block.text.strip()
+                    start = text.find("{")
+                    end   = text.rfind("}") + 1
+                    if start != -1 and end > start:
+                        try:
+                            return json.loads(text[start:end])
+                        except json.JSONDecodeError as exc:
+                            raise ValueError(f"JSON parse error: {exc}\n\n{text[start:end][:600]}")
+            raise ValueError("No JSON in end_turn response.")
+
+        if response.stop_reason == "pause_turn":
+            messages.append({"role": "assistant", "content": response.content})
+            continue
+
+        raise ValueError(f"Unexpected stop_reason: {response.stop_reason!r}")
+
+    raise RuntimeError("Exceeded max continuation attempts.")
 
 
 # ── HTML builder ───────────────────────────────────────────────────────────────
@@ -641,7 +646,7 @@ def build_html(data: dict, updated_at: str, changes: list[str] | None = None) ->
     recs        = summary.get("messaging_recommendations", [])
     changes     = changes or []
 
-    changes_html = "".join(f"<li>{c}</li>" for c in changes)
+    changes_html = "".join(f"<li>{c}</li>" for c in changes) if changes else "<li style='font-style:italic;color:#888'>First run — changes will appear after the next update.</li>"
     recs_html    = "".join(
         f'<div class="rec-card">'
         f'<div class="rec-audience">{r.get("audience","")}</div>'
@@ -760,7 +765,7 @@ def main() -> None:
         f"{len(data.get('stakeholders', []))} quotes"
     )
 
-    changes = compute_changes(prev_data, data)
+    changes = [] if not prev_data else compute_changes(prev_data, data)
     log(f"Changes detected: {len(changes)}")
 
     updated_at = datetime.now().strftime("%B %d, %Y at %I:%M %p")
