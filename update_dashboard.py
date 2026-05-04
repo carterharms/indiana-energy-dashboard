@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Indiana Energy Affordability Dashboard ‚Äî auto-updater.
+Indiana Energy Affordability Dashboard — auto-updater.
 
 Run once to generate dashboard.html, then schedule via cron to keep it current.
 Requires: pip install anthropic
@@ -20,63 +20,62 @@ DASHBOARD_PATH    = SCRIPT_DIR / "dashboard.html"
 LOG_PATH          = SCRIPT_DIR / "update.log"
 PREV_DATA_PATH    = SCRIPT_DIR / "previous_data.json"
 
-# ‚îÄ‚îÄ Research prompt ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ
+# ── Research prompt ────────────────────────────────────────────────────────────
 
 RESEARCH_PROMPT = """
-Today's date is {today}. You are a policy researcher specializing in Indiana
-energy affordability. You MUST use the web_search tool to find current
-information ‚Äî do NOT rely on training data. Search specifically for content
-from 2025 and 2026. Use multiple targeted searches per topic, including the
-year 2026 in your search queries.
+You are a policy researcher specializing in Indiana energy affordability.
+Search the web thoroughly and gather current, accurate information on the
+four topics below. Use multiple targeted searches per topic to find the
+most recent information available.
 
-‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ
-TOPIC 1 ‚Äî RECENT RATE CASES (last 12 months)
-‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TOPIC 1 — RECENT RATE CASES (last 12 months)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Search the Indiana Utility Regulatory Commission (IURC) and Indiana news sources
 for recent rate cases and significant proceedings involving:
-  ‚Ä¢ Duke Energy Indiana
-  ‚Ä¢ AES Indiana (formerly Indianapolis Power & Light / IPL)
-  ‚Ä¢ NIPSCO (Northern Indiana Public Service Company) ‚Äî gas & electric
-  ‚Ä¢ Vectren / CenterPoint Energy Indiana
-  ‚Ä¢ Any other Indiana electric or gas utilities
+  • Duke Energy Indiana
+  • AES Indiana (formerly Indianapolis Power & Light / IPL)
+  • NIPSCO (Northern Indiana Public Service Company) — gas & electric
+  • Vectren / CenterPoint Energy Indiana
+  • Any other Indiana electric or gas utilities
 
 For each case include:
   - utility: utility company name
   - case_number: IURC Cause number if available (e.g. "Cause No. 45XXX")
-  - description: what is being requested or decided (1‚Äì2 sentences)
+  - description: what is being requested or decided (1–2 sentences)
   - status: one of "Pending", "Approved", "Denied", "Settled", "Under Review"
   - date: filed date or decision date (Month Year format)
   - rate_change: rate increase/decrease amount or percentage if available, else ""
 
-‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ
-TOPIC 2 ‚Äî NEWS ARTICLES (last 60 days)
-‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ
-Find 8‚Äì10 recent news articles about:
-  ‚Ä¢ Indiana utility rates and affordability
-  ‚Ä¢ Utility disconnection / shutoff policies in Indiana
-  ‚Ä¢ LIHEAP and low-income energy assistance in Indiana
-  ‚Ä¢ IURC proceedings and decisions
-  ‚Ä¢ Energy burden on Indiana households
-  ‚Ä¢ Indiana energy policy developments
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TOPIC 2 — NEWS ARTICLES (last 60 days)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Find 8–10 recent news articles about:
+  • Indiana utility rates and affordability
+  • Utility disconnection / shutoff policies in Indiana
+  • LIHEAP and low-income energy assistance in Indiana
+  • IURC proceedings and decisions
+  • Energy burden on Indiana households
+  • Indiana energy policy developments
 
 For each article include:
   - headline: article title
   - source: publication name
   - date: published date
   - url: full URL
-  - summary: 2‚Äì3 sentence plain-language summary
+  - summary: 2–3 sentence plain-language summary
 
-‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ
-TOPIC 3 ‚Äî STAKEHOLDER VOICES (last 6 months)
-‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TOPIC 3 — STAKEHOLDER VOICES (last 6 months)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Find recent quotes or statements from Indiana energy stakeholders including:
-  ‚Ä¢ IURC commissioners
-  ‚Ä¢ Indiana Office of Utility Consumer Counselor (OUCC)
-  ‚Ä¢ Citizens Action Coalition of Indiana
-  ‚Ä¢ AARP Indiana
-  ‚Ä¢ Duke Energy Indiana, AES Indiana, NIPSCO executives
-  ‚Ä¢ Indiana legislators on energy/utility committees
-  ‚Ä¢ Community action agencies or other consumer advocates
+  • IURC commissioners
+  • Indiana Office of Utility Consumer Counselor (OUCC)
+  • Citizens Action Coalition of Indiana
+  • AARP Indiana
+  • Duke Energy Indiana, AES Indiana, NIPSCO executives
+  • Indiana legislators on energy/utility committees
+  • Community action agencies or other consumer advocates
 
 For each quote include:
   - name: person's full name
@@ -86,23 +85,23 @@ For each quote include:
   - source: where it appeared (news article, testimony, press release, etc.)
   - date: when it was said or published
 
-‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ
-TOPIC 4 ‚Äî STRATEGIC COMMUNICATIONS SUMMARY
-‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TOPIC 4 — STRATEGIC COMMUNICATIONS SUMMARY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Based on the search results above, apply Silverman and Smith's principles of
-strategic communication to recommend 3‚Äì4 messaging strategies for advocates
+strategic communication to recommend 3–4 messaging strategies for advocates
 working on Indiana energy affordability. For each recommendation include:
   - audience: the target audience (e.g. "Low-income ratepayers", "Legislators")
-  - message: the core message (1‚Äì2 sentences)
+  - message: the core message (1–2 sentences)
   - rationale: why this message works strategically (1 sentence)
 
-Also write a 2‚Äì3 sentence plain-language overview of the current Indiana
+Also write a 2–3 sentence plain-language overview of the current Indiana
 energy affordability landscape based on the search results.
 
-‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 OUTPUT FORMAT
-‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ
-Return ONLY a valid JSON object ‚Äî no text before or after it.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Return ONLY a valid JSON object — no text before or after it.
 Use this exact structure. Use YYYY-MM-DD format for all dates.
 
 {
@@ -146,7 +145,7 @@ Use this exact structure. Use YYYY-MM-DD format for all dates.
 Only include real, verifiable information from the search results provided.
 """
 
-# ‚îÄ‚îÄ HTML template ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ
+# ── HTML template ──────────────────────────────────────────────────────────────
 
 HTML_TEMPLATE = """<!DOCTYPE html>
 <html lang="en">
@@ -178,7 +177,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     line-height: 1.6;
   }}
 
-  /* ‚îÄ‚îÄ Header ‚îÄ‚îÄ */
+  /* ── Header ── */
   header {{
     background: var(--blue);
     color: var(--white);
@@ -215,7 +214,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     margin-left: auto;
   }}
 
-  /* ‚îÄ‚îÄ Layout ‚îÄ‚îÄ */
+  /* ── Layout ── */
   main {{
     max-width: 1200px;
     margin: 0 auto;
@@ -234,7 +233,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     .section-rate-cases {{ grid-column: 1; }}
   }}
 
-  /* ‚îÄ‚îÄ Section titles ‚îÄ‚îÄ */
+  /* ── Section titles ── */
   section h2 {{
     font-size: 1rem;
     font-weight: 700;
@@ -246,7 +245,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     margin-bottom: 16px;
   }}
 
-  /* ‚îÄ‚îÄ Cards ‚îÄ‚îÄ */
+  /* ── Cards ── */
   .card {{
     background: var(--white);
     border-radius: 8px;
@@ -263,7 +262,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     margin-top: 8px;
   }}
 
-  /* ‚îÄ‚îÄ Rate case cards ‚îÄ‚îÄ */
+  /* ── Rate case cards ── */
   .rate-grid {{
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -320,7 +319,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     padding: 2px 8px;
   }}
 
-  /* ‚îÄ‚îÄ Article cards ‚îÄ‚îÄ */
+  /* ── Article cards ── */
   .article-headline {{
     font-weight: 600;
     font-size: .92rem;
@@ -336,7 +335,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     color: #004899;
   }}
 
-  /* ‚îÄ‚îÄ Quote cards ‚îÄ‚îÄ */
+  /* ── Quote cards ── */
   blockquote {{
     font-size: .9rem;
     font-style: italic;
@@ -350,7 +349,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
   .attribution strong {{ display: block; color: var(--blue); }}
   .attribution span {{ color: var(--muted); }}
 
-  /* ‚îÄ‚îÄ Summary box ‚îÄ‚îÄ */
+  /* ── Summary box ── */
   .summary-box {{
     background: var(--white);
     border-radius: 8px;
@@ -405,7 +404,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
   }}
   .changes-list li:last-child {{ border-bottom: none; }}
   .changes-list li::before {{
-    content: "‚ñ∏";
+    content: "▸";
     position: absolute;
     left: 0;
     color: var(--gold);
@@ -469,12 +468,12 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 <body>
 
 <header>
-  <h1>‚ö° Indiana Energy Affordability Dashboard</h1>
-  <p>Rate cases ¬∑ News ¬∑ Stakeholder voices ‚Äî updated automatically</p>
+  <h1>⚡ Indiana Energy Affordability Dashboard</h1>
+  <p>Rate cases · News · Stakeholder voices — updated automatically</p>
   <div class="header-meta">
-    <span class="stat-pill">üìã {n_cases} Rate Cases</span>
-    <span class="stat-pill">üì∞ {n_articles} Articles</span>
-    <span class="stat-pill">üí¨ {n_quotes} Quotes</span>
+    <span class="stat-pill">📋 {n_cases} Rate Cases</span>
+    <span class="stat-pill">📰 {n_articles} Articles</span>
+    <span class="stat-pill">💬 {n_quotes} Quotes</span>
     <span class="updated">Last updated: {updated_at}</span>
   </div>
 </header>
@@ -506,15 +505,15 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 </main>
 
 <footer>
-  Indiana Energy Affordability Dashboard ¬∑ Research by Claude (Anthropic) ¬∑
-  Auto-refreshed weekly ¬∑ Data from public sources
+  Indiana Energy Affordability Dashboard · Research by Claude (Anthropic) ·
+  Auto-refreshed weekly · Data from public sources
 </footer>
 
 </body>
 </html>
 """
 
-# ‚îÄ‚îÄ Helpers ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ
+# ── Helpers ────────────────────────────────────────────────────────────────────
 
 def log(msg: str) -> None:
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -540,7 +539,7 @@ def compute_changes(prev: dict, curr: dict) -> list[str]:
     for c in curr.get("rate_cases", []):
         key = f"{c.get('utility','')}|{c.get('case_number','')}"
         if key not in prev_cases:
-            changes.append(f"New rate case: {c.get('utility','')} ‚Äî {c.get('description','')[:80]}")
+            changes.append(f"New rate case: {c.get('utility','')} — {c.get('description','')[:80]}")
         elif prev_cases[key].get("status") != c.get("status"):
             changes.append(f"Status change: {c.get('utility','')} case now {c.get('status','')}")
 
@@ -561,12 +560,11 @@ def compute_changes(prev: dict, curr: dict) -> list[str]:
 def research(client: anthropic.Anthropic) -> dict:
     """Use Anthropic server-side web search for live, high-quality results."""
     tools    = [{"type": "web_search_20260209", "name": "web_search"}]
-    today    = datetime.now().strftime("%B %d, %Y")
-    messages = [{"role": "user", "content": RESEARCH_PROMPT.format(today=today)}]
+    messages = [{"role": "user", "content": RESEARCH_PROMPT}]
     container_id = None
 
     for attempt in range(8):
-        log(f"  API call {attempt + 1}‚Ä¶")
+        log(f"  API call {attempt + 1}…")
         kwargs = dict(
             model="claude-sonnet-4-6",
             max_tokens=8000,
@@ -583,7 +581,7 @@ def research(client: anthropic.Anthropic) -> dict:
                 break
             except anthropic.RateLimitError:
                 wait = 65 * (retry + 1)
-                log(f"  Rate limit ‚Äî waiting {wait}s‚Ä¶")
+                log(f"  Rate limit — waiting {wait}s…")
                 time.sleep(wait)
         else:
             raise RuntimeError("Rate limit retries exhausted.")
@@ -627,7 +625,7 @@ def research(client: anthropic.Anthropic) -> dict:
                 log(f"  pause_turn block: type={btype} id={bid} extra_keys={list(extra.keys())}")
                 if not container_id and bid:
                     container_id = bid
-                    log(f"  container_id set from block id: {container_id[:20]}‚Ä¶")
+                    log(f"  container_id set from block id: {container_id[:20]}…")
             messages.append({"role": "assistant", "content": response.content})
             continue
 
@@ -636,7 +634,7 @@ def research(client: anthropic.Anthropic) -> dict:
     raise RuntimeError("Exceeded max continuation attempts.")
 
 
-# ‚îÄ‚îÄ HTML builder ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ
+# ── HTML builder ───────────────────────────────────────────────────────────────
 
 def _badge(status: str) -> str:
     s = status.lower()
@@ -650,13 +648,13 @@ def _badge(status: str) -> str:
 
 
 def build_html(data: dict, updated_at: str, changes: list[str] | None = None) -> str:
-    # ‚îÄ‚îÄ Summary box ‚îÄ‚îÄ
+    # ── Summary box ──
     summary     = data.get("summary", {})
     overview    = summary.get("overview", "")
     recs        = summary.get("messaging_recommendations", [])
     changes     = changes or []
 
-    changes_html = "".join(f"<li>{c}</li>" for c in changes) if changes else "<li style='font-style:italic;color:#888'>First run ‚Äî changes will appear after the next update.</li>"
+    changes_html = "".join(f"<li>{c}</li>" for c in changes) if changes else "<li style='font-style:italic;color:#888'>First run — changes will appear after the next update.</li>"
     recs_html    = "".join(
         f'<div class="rec-card">'
         f'<div class="rec-audience">{r.get("audience","")}</div>'
@@ -679,7 +677,7 @@ def build_html(data: dict, updated_at: str, changes: list[str] | None = None) ->
         </div>
       </div>"""
 
-    # ‚îÄ‚îÄ Rate cases ‚îÄ‚îÄ
+    # ── Rate cases ──
     rate_cases_html = ""
     for case in data.get("rate_cases", []):
         status = case.get("status", "")
@@ -703,7 +701,7 @@ def build_html(data: dict, updated_at: str, changes: list[str] | None = None) ->
     if not rate_cases_html:
         rate_cases_html = '<p class="empty">No recent rate cases found.</p>'
 
-    # ‚îÄ‚îÄ Articles (sorted newest first) ‚îÄ‚îÄ
+    # ── Articles (sorted newest first) ──
     articles_html = ""
     sorted_articles = sorted(
         data.get("articles", []),
@@ -719,13 +717,13 @@ def build_html(data: dict, updated_at: str, changes: list[str] | None = None) ->
       <div class="card">
         <div class="article-headline">{link}</div>
         <p style="font-size:.85rem;color:#444">{art.get("summary","")}</p>
-        <div class="meta">{art.get("source","")} ¬∑ {art.get("date","")}</div>
+        <div class="meta">{art.get("source","")} · {art.get("date","")}</div>
       </div>"""
 
     if not articles_html:
         articles_html = '<p class="empty">No recent articles found.</p>'
 
-    # ‚îÄ‚îÄ Stakeholders ‚îÄ‚îÄ
+    # ── Stakeholders ──
     stakeholders_html = ""
     for s in data.get("stakeholders", []):
         stakeholders_html += f"""
@@ -735,7 +733,7 @@ def build_html(data: dict, updated_at: str, changes: list[str] | None = None) ->
           <strong>{s.get("name","")}</strong>
           <span>{s.get("title","")}, {s.get("organization","")}</span>
         </div>
-        <div class="meta">{s.get("source","")} ¬∑ {s.get("date","")}</div>
+        <div class="meta">{s.get("source","")} · {s.get("date","")}</div>
       </div>"""
 
     if not stakeholders_html:
@@ -753,15 +751,15 @@ def build_html(data: dict, updated_at: str, changes: list[str] | None = None) ->
     )
 
 
-# ‚îÄ‚îÄ Main ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ
+# ── Main ───────────────────────────────────────────────────────────────────────
 
 def main() -> None:
-    log("‚îÅ‚îÅ‚îÅ Dashboard update started ‚îÅ‚îÅ‚îÅ")
+    log("━━━ Dashboard update started ━━━")
     client = anthropic.Anthropic()
 
     prev_data = load_previous_data()
 
-    log("Researching rate cases, articles, and stakeholder quotes‚Ä¶")
+    log("Researching rate cases, articles, and stakeholder quotes…")
     try:
         data = research(client)
     except Exception as exc:
@@ -769,7 +767,7 @@ def main() -> None:
         sys.exit(1)
 
     log(
-        f"Research complete ‚Äî "
+        f"Research complete — "
         f"{len(data.get('rate_cases', []))} rate cases, "
         f"{len(data.get('articles', []))} articles, "
         f"{len(data.get('stakeholders', []))} quotes"
@@ -781,11 +779,11 @@ def main() -> None:
     updated_at = datetime.now().strftime("%B %d, %Y at %I:%M %p")
     html = build_html(data, updated_at, changes)
     DASHBOARD_PATH.write_text(html, encoding="utf-8")
-    log(f"Dashboard written ‚Üí {DASHBOARD_PATH}")
+    log(f"Dashboard written → {DASHBOARD_PATH}")
 
     PREV_DATA_PATH.write_text(json.dumps(data, indent=2), encoding="utf-8")
-    log(f"Previous data saved ‚Üí {PREV_DATA_PATH}")
-    log("‚îÅ‚îÅ‚îÅ Done ‚îÅ‚îÅ‚îÅ")
+    log(f"Previous data saved → {PREV_DATA_PATH}")
+    log("━━━ Done ━━━")
 
 
 if __name__ == "__main__":
