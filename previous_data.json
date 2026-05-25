@@ -1,22 +1,22 @@
 {
   "summary": {
-    "overview": "Indiana is experiencing an acute energy affordability crisis, with average residential electric bills surging approximately 17.5% in the 12-month period ending July 2025\u2014the largest single-year jump in two decades\u2014driven by a wave of rate increases from all five major investor-owned utilities. In response, Governor Mike Braun signed landmark legislation (HEA 1002) in February 2026 introducing performance-based ratemaking, low-income assistance requirements, and summer disconnection protections, while the newly reconstituted IURC under Chair Andy Zay launched a statewide Investigative Inquiry on Energy Affordability in March 2026, holding public hearings and a listening tour across ten Indiana communities. Compounding these pressures are a federal DOE emergency order forcing Indiana coal plants to remain open past their planned 2025 retirement dates, an IURC investigation into NIPSCO overcharging 3,500 gas customers double their actual usage, a pending AES Indiana rate case with a IURC final order deadline of June 24, 2026, and federal threats to eliminate LIHEAP funding\u2014leaving more than 100,000 low-income Hoosier households who rely on the Energy Assistance Program in a precarious position.",
+    "overview": "Indiana is experiencing a significant energy affordability crisis, with average residential electric bills rising 17.5% in a single year (2024\u20132025)\u2014the most severe increase in at least two decades\u2014driven by cascading rate approvals for all five major investor-owned utilities. In response, the Indiana General Assembly passed House Enrolled Act 1002 (signed February 2026), which introduces performance-based ratemaking and new low-income customer protections, while the IURC launched a landmark investigative inquiry into the 'big five' utilities in March 2026. Compounding affordability pressures are federal emergency orders keeping aging coal plants online at substantial cost to consumers, and rapidly growing energy demand from AI data centers that advocates warn risks shifting costs onto residential ratepayers.",
     "messaging_recommendations": [
       {
-        "audience": "Low-income ratepayers and households receiving energy assistance",
-        "message": "You are not alone\u2014Indiana's energy affordability crisis is a structural problem, not a personal failure. Know your rights under HEA 1002, including new protections against disconnection on dangerously hot days and your right to enroll in a low-income assistance program that every investor-owned utility must now offer."
+        "audience": "Low-income ratepayers and households facing disconnection",
+        "message": "Indiana's Energy Assistance Program (EAP/LIHEAP) can help you pay your heat and electric bills, and the new state law (HEA 1002) prohibits summer shutoffs for eligible low-income customers and requires utilities to offer assistance programs\u2014know your rights and apply every fall when the portal reopens."
       },
       {
-        "audience": "Indiana state legislators and IURC commissioners",
-        "message": "The record number of customer complaints in 2026, the NIPSCO overbilling scandal, and the 17.5% single-year bill spike show that existing regulatory tools are insufficient; use the Investigative Inquiry findings to mandate tracker reform, strengthen performance-based ratemaking benchmarks, and protect LIHEAP-eligible households from compounding rate hikes."
+        "audience": "Indiana legislators and IURC commissioners",
+        "message": "Indiana residential electric bills have climbed 28.9% since 2014, far outpacing inflation and peer states; the tools in HEA 1002 are a vital first step, but removing automatic cost-tracker mechanisms and strengthening IURC's authority to reject unjustified rate hikes are essential to making affordability reform durable."
       },
       {
-        "audience": "Media and general Indiana public",
-        "message": "Indiana households are paying the highest electric bills in the region at a time when federal energy assistance is under existential threat; transparent, plain-language billing and enforceable affordability standards\u2014not voluntary commitments\u2014are what Hoosier families need and what HEA 1002 has begun to require."
+        "audience": "General public and media",
+        "message": "Every major Indiana electric utility raised rates significantly in 2024\u20132025, and data center growth now threatens to shift even more costs onto households; Hoosiers deserve transparent billing, genuine accountability from monopoly utilities, and assurance that large industrial customers pay their fair share of grid costs."
       },
       {
-        "audience": "Utility executives and their shareholders",
-        "message": "The new performance-based ratemaking framework in HEA 1002 ties your return on equity to customer affordability outcomes and service restoration metrics, creating a direct financial incentive to lower bills and improve reliability rather than simply maximizing rate base growth through successive rate cases."
+        "audience": "Community action agencies and social service providers",
+        "message": "With the 2025\u20132026 EAP application cycle closed and bills at record highs, connect clients now with utility low-income assistance programs mandated under HEA 1002, and document the human cost of energy burden to strengthen IURC's investigative inquiry record ahead of the Fall 2026 EAP reopening."
       }
     ]
   },
@@ -24,219 +24,211 @@
     {
       "utility": "Duke Energy Indiana",
       "case_number": "Cause No. 46038",
-      "description": "Duke Energy Indiana filed for a two-phase electric base rate increase of approximately $491.5 million (16.2%). The IURC approved a significantly reduced increase of approximately $295.7 million in annual revenues, implemented in steps beginning March 2025.",
+      "description": "Duke Energy Indiana's first base rate case since 2019, requesting an approximately 16.2% increase in retail revenues. The IURC approved an increase of approximately $295.7 million in annual revenues (reduced from Duke's request of ~$491.5 million), implemented in phases through March 2026.",
       "status": "Approved",
       "date": "2025-02-03",
-      "rate_change": "+$295.7 million annually (~$19.16/month for typical residential customer using 1,000 kWh)"
-    },
-    {
-      "utility": "Duke Energy Indiana",
-      "case_number": "Cause No. 45911 (Coal Ash ECR)",
-      "description": "Duke Energy sought to recover approximately $88 million from ratepayers for coal ash compliance costs through an environmental cost recovery mechanism. The Indiana Court of Appeals ruled in August 2025 that the IURC 'impermissibly applied' Indiana law retroactively in approving the recovery.",
-      "status": "Denied",
-      "date": "2025-08-27",
-      "rate_change": "~$88 million recovery reversed by Court of Appeals"
+      "rate_change": "Approximately $295.7 million annual revenue increase (~20% residential bill increase); Duke initially sought ~$491.5 million."
     },
     {
       "utility": "AES Indiana",
       "case_number": "Cause No. 46258",
-      "description": "AES Indiana filed for a $192.9 million base rate increase in June 2025 (13.5% phased over two steps: ~7.5% in Q2 2026 and ~6% in January 2027). A partial settlement of approximately $90 million was reached with industrial customers and the City of Indianapolis in October 2025, but the OUCC and Citizens Action Coalition opposed the settlement; the case is fully briefed with a final IURC order deadline of June 24, 2026.",
-      "status": "Under Review",
-      "date": "2025-06-03",
-      "rate_change": "Requested +$192.9M; settlement at ~$90M increase; OUCC recommended a rate reduction of $21.2M"
+      "description": "AES Indiana filed for a $192.9 million base rate increase in 2025. A partial settlement agreement among AES Indiana, industrial customers, Walmart, and the City of Indianapolis proposes a $90.7 million increase; the OUCC and Citizens Action Coalition oppose the settlement. The IURC deadline for a final order is June 24, 2026.",
+      "status": "Pending",
+      "date": "2025-06-01",
+      "rate_change": "Settlement proposes $90.7 million annual revenue increase; OUCC recommends a $21.2 million rate reduction instead."
     },
     {
       "utility": "NIPSCO (Northern Indiana Public Service Company)",
-      "case_number": "Cause No. 44094",
-      "description": "NIPSCO filed for an electric base rate increase of approximately $368.7 million. A settlement agreement was reached reducing the increase to approximately $257 million; the IURC approved the settlement on June 26, 2025, with rates phased in beginning July 2025 through early 2026.",
+      "case_number": "Cause No. 46120",
+      "description": "NIPSCO's 2024\u20132025 electric base rate case, in which most parties including the OUCC reached a settlement agreement. The IURC approved a ~$257 million annual revenue increase (reduced from NIPSCO's initial $368.7 million request), phased in beginning July 2025 through Q1 2026.",
       "status": "Approved",
       "date": "2025-06-26",
-      "rate_change": "+$257 million annually (~$23/month or 16.75% for average residential customer using 672 kWh)"
+      "rate_change": "Approximately $257 million annual revenue increase; average residential customer sees ~$23/month (16.75%) increase, phased in through Q1 2026."
     },
     {
       "utility": "NIPSCO (Northern Indiana Public Service Company)",
-      "case_number": "Cause No. 46329",
-      "description": "The IURC opened a formal investigation into NIPSCO in November 2025 after the utility discovered and belatedly disclosed that a rollout of new automated meter reading technology resulted in 3,542 natural gas customers being charged double their actual usage. Newly unsealed records in March 2026 showed NIPSCO discovered the problem in October 2024 but did not inform the IURC until November 2025.",
-      "status": "Under Review",
-      "date": "2025-11-26",
-      "rate_change": "NIPSCO credited approximately $1.4 million to overcharged accounts; investigation ongoing"
+      "case_number": "Cause No. 45967",
+      "description": "NIPSCO natural gas base rate case filed in 2023\u20132024. The IURC approved a settlement resulting in a $120.9 million increase (reduced from NIPSCO's initial larger request), with rates phased in through March 2025.",
+      "status": "Approved",
+      "date": "2024-07-31",
+      "rate_change": "$120.9 million annual increase; average residential customer sees ~$5.40/month increase."
     },
     {
-      "utility": "CenterPoint Energy Indiana (electric)",
+      "utility": "CenterPoint Energy Indiana (formerly Vectren)",
       "case_number": "Cause No. 45990",
-      "description": "CenterPoint Energy filed for a three-phase electric rate increase of $118.8 million (16.02%). The IURC approved an $80 million increase on February 3, 2025, with final phase taking effect in early 2026; the OUCC found an increase of $48.3 million was warranted.",
+      "description": "CenterPoint Energy Indiana's electric base rate case requesting an $118.8 million (16.02%) increase. The IURC approved an $80 million increase via a settlement with industrial customers; the increase is being phased in over multiple steps, with a second phase taking effect in early 2026.",
       "status": "Approved",
       "date": "2025-02-03",
-      "rate_change": "+$80 million annually (~$35/month for average residential customer using 799 kWh, phased)"
-    },
-    {
-      "utility": "NIPSCO (Northern Indiana Public Service Company) \u2014 GenCo",
-      "case_number": "Cause No. 46183",
-      "description": "NIPSCO received IURC approval to create a subsidiary (NIPSCO Generation/GenCo) intended to structurally isolate large-load (data center) generation costs from residential and small commercial ratepayers, allowing data center customers to be served under separate contracts without shifting infrastructure costs to ordinary customers.",
-      "status": "Approved",
-      "date": "2025-09-01",
-      "rate_change": "NIPSCO projects ~$1 billion in ratepayer savings over 15 years from data center cost isolation"
+      "rate_change": "$80 million annual revenue increase approved; average residential customer saw ~$11.18/month increase in step one; second step took effect early 2026."
     }
   ],
   "articles": [
     {
-      "headline": "Gov. Braun signs House Bill 1002 to tackle Indiana's energy affordability crisis",
-      "source": "WBIW / NWI Utilities",
-      "date": "2026-02-26",
-      "url": "https://www.wbiw.com/2026/03/02/gov-braun-signs-house-bill-1002-to-tackle-indianas-energy-affordability-crisis/",
-      "summary": "Governor Mike Braun signed HEA 1002 into law on February 26, 2026, a sweeping energy bill backed with bipartisan support. The law introduces performance-based ratemaking tied to customer affordability metrics, requires utilities to offer low-income assistance programs by July 1, 2026, mandates levelized billing for EAP-enrolled households, and creates a summer disconnection moratorium on days when the heat index is forecast to reach 95\u00b0F or higher."
+      "headline": "Utility accountability starts with better public policy",
+      "source": "Indiana Capital Chronicle",
+      "date": "2026-05-22",
+      "url": "https://indianacapitalchronicle.com/2026/05/22/utility-accountability-starts-with-better-public-policy/",
+      "summary": "An opinion piece examining the March 2026 IURC investigative inquiry into Indiana's five largest utilities, arguing that regulators need stronger authority to reject unjustified rate hikes and require more from utilities on behalf of residential customers. The piece notes that utility companies blamed 'market shifts' and customer usage for high bills while regulators conducted unprecedented public questioning. It calls for structural policy reforms to accompany the new HEA 1002 law."
+    },
+    {
+      "headline": "Statehouse push for affordable power collides with data center growth",
+      "source": "Indiana Public Media (IPM)",
+      "date": "2026-05-22",
+      "url": "https://www.ipm.org/news/2026-05-22/statehouse-push-for-affordable-power-collides-with-data-center-growth/",
+      "summary": "Indiana's new law (HEA 1002) is designed to hold utilities accountable for affordability, but simultaneous state encouragement of energy-hungry AI data centers may undermine those efforts. The article examines the tension between economic development goals and rising residential utility costs, and the IURC's new activist posture under Chair Andy Zay. Advocates warn that data center growth risks shifting substantial grid costs onto residential ratepayers."
+    },
+    {
+      "headline": "'Big five' Indiana utilities defend rates in regulator questioning",
+      "source": "Indiana Capital Chronicle",
+      "date": "2026-03-24",
+      "url": "https://indianacapitalchronicle.com/2026/03/24/big-five-indiana-utilities-defend-rates-in-regulator-questioning/",
+      "summary": "Indiana regulators convened the state's five largest investor-owned utilities for a daylong affordability hearing, pressing them on rate increases, billing transparency, and customer complaints. NIPSCO faced especially pointed questions after the IURC noted it had already received more consumer complaints in 2026 than in all of 2025. Utility executives generally argued that customer usage patterns and infrastructure investment needs drove rising bills."
     },
     {
       "headline": "Indiana utility regulators call in 'big five' energy providers for affordability investigation",
       "source": "Indiana Capital Chronicle",
       "date": "2026-02-25",
       "url": "https://indianacapitalchronicle.com/2026/02/25/indiana-utility-regulators-call-in-big-five-energy-providers-for-affordability-investigation/",
-      "summary": "IURC Chair Andy Zay announced the commission would conduct a formal Investigative Inquiry on Energy Affordability, calling in all five major investor-owned electric utilities (AES Indiana, CenterPoint Energy, Duke Energy, Indiana Michigan Power, and NIPSCO). Zay said the current balance between utility profits and customer bills feels 'dramatically out of whack' for many Hoosiers, and the inquiry is the beginning of a process to address rising customer outrage."
+      "summary": "IURC Chair Andy Zay announced an 'investigative inquiry' into the affordability practices of Indiana's five investor-owned electric utilities, calling it the beginning of a process to find short- and long-term solutions to rising bills. The inquiry's second phase included 10 community listening sessions across the state in March and April 2026. Zay said the balance between utility needs and customer protection 'feels dramatically out of whack right now for many, many Hoosiers.'"
     },
     {
-      "headline": "'Big five' Indiana utilities defend rates in regulator questioning",
-      "source": "Indiana Capital Chronicle / Northwest Indiana Business Magazine",
-      "date": "2026-03-24",
-      "url": "https://indianacapitalchronicle.com/2026/03/24/big-five-indiana-utilities-defend-rates-in-regulator-questioning/",
-      "summary": "At the March 24, 2026 IURC Investigative Inquiry, utility representatives argued that customer usage and extreme temperatures\u2014not just rates\u2014are the primary drivers of high bills. AES Indiana President Brandi Davis-Handy noted her company's bills have largely tracked inflation, while CenterPoint's Indiana president Michael Roeder touted a commitment to stable rates through 2027; the IURC announced it would move to a second phase of inquiry and a statewide listening tour."
+      "headline": "Gov. Braun says new law will protect Indiana utility customers from rising bills",
+      "source": "WFYI Public Media",
+      "date": "2026-04-06",
+      "url": "https://www.wfyi.org/statewide/2026-04-06/gov-braun-says-new-law-will-protect-indiana-utility-customers-from-rising-bills/",
+      "summary": "Gov. Mike Braun ceremonially signed House Enrolled Act 1002 at a Statehouse event, reaffirming his commitment to holding utility companies accountable through new performance-based ratemaking requirements. The law mandates low-income assistance programs, prohibits summer shutoffs for eligible low-income customers, and introduces three-year multi-year rate plans. Braun said it would be 'up to his administration to implement it.'"
     },
     {
-      "headline": "NIPSCO overcharged 3,500 natural gas customers, newly unsealed records show",
-      "source": "21Alive (WPTA)",
-      "date": "2026-03-18",
-      "url": "https://www.21alivenews.com/2026/03/18/nipsco-overcharged-3500-natural-gas-customers-newly-unsealed-records-show/",
-      "summary": "Newly unsealed IURC records revealed NIPSCO discovered in October 2024 that faulty installation of new automated meter reading technology caused 3,542 customers to be billed double their actual gas usage, but the utility did not notify state regulators for nearly a year\u2014until November 2025. NIPSCO credited approximately $1.4 million to affected accounts, covering 50% of gas usage charges over a 12-month period, while 317 customers were billed at half their true usage and will not be required to repay the difference."
-    },
-    {
-      "headline": "Consumer advocates: Spike in electric bills shows Indiana energy plan isn't working",
-      "source": "Indiana Public Radio / WFYI",
-      "date": "2025-07-24",
-      "url": "https://indianapublicradio.org/news/2025/07/consumer-advocates-spike-in-electric-bills-shows-indiana-energy-plan-isnt-working/",
-      "summary": "Citizens Action Coalition Program Director Ben Inskeep said 2025 marked the highest year-over-year jump in Indiana electric bills in two decades, with NIPSCO customers seeing the largest increase of nearly $50/month, followed by CenterPoint customers at $44/month. The average Indiana resident was paying $28 more per month for electricity than in the prior year, leading advocates to say the 2023 utility regulatory law is failing consumers."
-    },
-    {
-      "headline": "Indiana appeals court rules that regulators 'impermissibly' let Duke raise rates for coal cleanup",
+      "headline": "Utilities warn of soaring costs related to Trump order for Indiana coal plants to stay open",
       "source": "Indiana Capital Chronicle",
-      "date": "2025-08-27",
-      "url": "https://indianacapitalchronicle.com/2025/08/27/indiana-appeals-court-rules-that-regulators-impermissibly-let-duke-raise-rates-for-coal-cleanup/",
-      "summary": "The Indiana Court of Appeals ruled that the IURC impermissibly applied Indiana law retroactively when it allowed Duke Energy to recover approximately $88 million in coal ash compliance costs from ratepayers through a rate increase. The three-judge panel reversed the IURC's order, meaning Duke Energy customers may not have to pay for those coal cleanup costs, in a case brought by Citizens Action Coalition and Earthjustice."
+      "date": "2026-03-26",
+      "url": "https://indianacapitalchronicle.com/2026/03/26/utilities-warn-of-soaring-costs-related-to-trump-order-for-indiana-coal-plants-to-stay-open/",
+      "summary": "Federal emergency orders from the U.S. Department of Energy are requiring NIPSCO and CenterPoint Energy to keep aging coal plants online months after their planned retirement, and both utilities warned the IURC that compliance costs are rapidly mounting into the hundreds of millions. Keeping NIPSCO's Schahfer plant operational costs consumers an estimated $174,000 per day, according to a Sierra Club analysis. Environmental and consumer advocates have filed legal challenges to the orders."
+    },
+    {
+      "headline": "Hoosiers' electric bills spike 17.5% in one year",
+      "source": "Indiana Capital Chronicle / Indiana Public Media",
+      "date": "2025-07-24",
+      "url": "https://indianacapitalchronicle.com/briefs/hoosiers-electric-bills-spike-17-5-in-one-year/",
+      "summary": "A Citizens Action Coalition analysis found Indiana's average residential electric bill rose 17.5% (about $28/month) in a single year, the most severe increase in at least two decades. NIPSCO customers saw the highest jump at 26.7%, followed by CenterPoint at 25%, Duke at 20%, and AES at 12%. CAC called the trend 'nothing more than lip service' from state leaders who claimed to be prioritizing affordability."
     },
     {
       "headline": "Your electric bill is going to change. New law aims to stabilize utilities",
       "source": "WFYI Public Media",
       "date": "2026-02-27",
-      "url": "https://www.wfyi.org/public-affairs/2026-02-27/hb1002-electric-utilities-new-law-will-change-your-bill",
-      "summary": "WFYI explained the major consumer-facing impacts of HEA 1002: Indiana residents will see new billing options including automatic levelized billing for low-income households enrolled in energy assistance programs, utilities must submit quarterly customer data reports to the OUCC, and a new disconnection moratorium will protect customers on the hottest summer days when the National Weather Service forecasts a heat index of 95\u00b0F or higher within 48 hours."
+      "url": "https://www.wfyi.org/public-affairs/2026-02-27/hb1002-electric-utilities-new-law-will-change-your-bill/",
+      "summary": "Indiana's House Bill 1002 (now law) introduces several key changes to electric utility regulation, including requiring utilities to submit three-year rate plans, tying rates to performance metrics, mandating regular affordability data reporting, and requiring all residential customers to be enrolled in levelized billing (with an opt-out option). The law is intended to address pocketbook issues as energy demand and bills continue to rise. Some lawmakers said the measures do not go far enough to help everyday Hoosiers."
     },
     {
-      "headline": "AES Indiana customers told regulators their stacks of utility bills don't add up",
+      "headline": "'A real short-term crisis here': Regulators press Indiana utilities on rising energy costs",
       "source": "WFYI Public Media",
-      "date": "2026-04-21",
-      "url": "https://www.wfyi.org/wfyi-news/2026-04-21/indianapolis-utility-regulators-aes-indiana-billing-town-hall",
-      "summary": "At an IURC listening session focused on AES Indiana customers in Indianapolis, residents brought stacks of utility bills to show regulators their financial strain and confusion over charges. IURC Chair Andy Zay, who attended alongside commissioners Bob Deig and Anthony Swinger, said the commission was investigating because the state has heard from residents about their financial pains and the balance between utility and customer interests must be restored."
+      "date": "2026-03-24",
+      "url": "https://www.wfyi.org/news/articles/indiana-utility-regulatory-commission-hearing-utility-providers-cost/",
+      "summary": "IURC commissioners used the March 24, 2026 affordability hearing to press utilities on their high rates, billing transparency, and customer service amid mounting public frustration. NIPSCO announced during the hearing that it would extend its winter disconnection moratorium through May 15, 2026, and waive reconnect fees for eligible customers. The second phase of the IURC inquiry, consisting of 10 community listening sessions, was announced to run from late March through late April 2026."
     },
     {
-      "headline": "Indiana's Energy Assistance Program now open: What you need to know",
-      "source": "Indianapolis Recorder",
-      "date": "2025-10-01",
-      "url": "https://indianapolisrecorder.com/eap-energy-assistance-program-indiana/",
-      "summary": "Indiana's Energy Assistance Program (EAP/LIHEAP) opened for applications on October 1, 2025, accepting submissions through April 20, 2026, with FY 2026 funding totaling $87.1 million for the state. The federally funded program provides a one-time annual benefit paid directly to utility companies on behalf of more than 100,000 low-income Hoosier households, though benefit amounts for 2025-2026 were expected to be lower than prior years."
-    },
-    {
-      "headline": "DOE orders Indiana coal units totaling more than 950 MW to run past retirement dates",
-      "source": "Utility Dive",
-      "date": "2025-12-24",
-      "url": "https://www.utilitydive.com/news/doe-indiana-coal-nipsco-centerpoint-emergency-order/808660/",
-      "summary": "U.S. Energy Secretary Chris Wright issued emergency orders on December 23, 2025, directing NIPSCO and CenterPoint Energy to keep coal-fired generating units at the Schahfer and F.B. Culley stations operational past their planned December 31, 2025 retirement dates, citing Midwest grid stability concerns. Citizens Action Coalition warned the forced operation of the aging, costly coal units would result in higher bills for Hoosiers already reeling from record-high rate increases, and Earthjustice subsequently challenged the orders in federal court."
+      "headline": "High Indiana NIPSCO utility bills a yearslong affordability crisis, advocates say",
+      "source": "FOX 32 Chicago",
+      "date": "2026-03-01",
+      "url": "https://www.fox32chicago.com/news/indiana-nipsco-bills-crisis/",
+      "summary": "Citizens Action Coalition Executive Director Kerwin Olson told Fox Chicago that NIPSCO customers are experiencing a 'perfect storm' of infrastructure investment costs and favorable state laws that limit the IURC's ability to hold utilities accountable. Olson said NIPSCO is 'the poster child for cost shifting from industrial customers on to residential customers,' citing declined industrial load and rising residential bills. State lawmakers are reportedly working on legislative fixes as constituent complaints about NIPSCO surge."
     }
   ],
   "stakeholders": [
     {
       "name": "Andy Zay",
-      "title": "Chairman",
+      "title": "Chair",
       "organization": "Indiana Utility Regulatory Commission (IURC)",
-      "quote": "That balance feels dramatically out of whack right now for many, many Hoosiers and today is the beginning of a process that we are labeling an investigative inquiry. We're asking our five investor-owned utilities that we regulate on a week-in, week-out basis \u2026 to come to this room and have an open dialogue.",
-      "source": "Indiana Capital Chronicle / Daily Journal news conference coverage",
+      "quote": "That balance feels dramatically out of whack right now for many, many Hoosiers and today is the beginning of a process that we are labeling an investigative inquiry. \u2026 We're asking our five investor-owned utilities that we regulate on a week-in, week-out basis \u2026 to come to this room and have an open dialog about affordability.",
+      "source": "Indiana Capital Chronicle / news conference",
       "date": "2026-02-25"
     },
     {
-      "name": "Andy Zay",
-      "title": "Chairman",
+      "name": "Anthony Swinger",
+      "title": "Commissioner",
       "organization": "Indiana Utility Regulatory Commission (IURC)",
-      "quote": "Energy affordability is one of the most pressing challenges states are facing today. We're seeing rising energy costs driven by a range of factors. (paraphrased from published interview)",
-      "source": "Journal Gazette, Five Questions interview",
-      "date": "2026-03-01"
+      "quote": "If you look at the total number of CAD complaints this year, it's at the same level that it was for all 12 months (of) 2025 \u2014 with more than half the complaints received statewide about NIPSCO. (Paraphrased from direct quote at the March 24, 2026 affordability hearing.)",
+      "source": "Indiana Capital Chronicle, reporting on the March 24, 2026 IURC affordability hearing",
+      "date": "2026-03-24"
     },
     {
       "name": "Abby Gray",
       "title": "Indiana Utility Consumer Counselor",
       "organization": "Indiana Office of Utility Consumer Counselor (OUCC)",
-      "quote": "The settlement agreement filed by AES and other parties shows the utility's initial request was inflated and unnecessary. The OUCC stands by its initial recommendations for a reduction from current rates and will oppose the utility's settlement agreement.",
-      "source": "OUCC press release / Daily Journal / Indiana Capital Chronicle",
-      "date": "2025-10-16"
-    },
-    {
-      "name": "Abby Gray",
-      "title": "Indiana Utility Consumer Counselor",
-      "organization": "Indiana Office of Utility Consumer Counselor (OUCC)",
-      "quote": "My team is recommending additional reductions that would reduce the utility's current rates and help lessen the burden on ratepayers. We received thousands of consumer comments in this case, highlighting serious hardships many customers are facing.",
-      "source": "OUCC news release on AES Indiana rate case recommendations",
-      "date": "2025-09-09"
+      "quote": "AES Indiana has not demonstrated sufficient evidence for an increase in this rate case, which it filed less than 14 months after receiving Commission approval in its last rate case. My team is recommending additional reductions that would reduce the utility's current rates and help lessen the burden on ratepayers.",
+      "source": "OUCC news release / Indiana Capital Chronicle",
+      "date": "2025-09-10"
     },
     {
       "name": "Kerwin Olson",
       "title": "Executive Director",
       "organization": "Citizens Action Coalition of Indiana",
-      "quote": "For too long, Hoosiers have been footing the bill for decisions they didn't make and policies they didn't ask for. Indiana's regulatory system should be built to protect consumers, but that goal can only be achieved if lawmakers give regulators the tools and authority it needs. The solutions have been ready for years. The need is now incredibly urgent.",
-      "source": "WBIW / Indiana Conservation Voters policy plan press release",
-      "date": "2025-12-10"
-    },
-    {
-      "name": "Ben Inskeep",
-      "title": "Program Director",
-      "organization": "Citizens Action Coalition of Indiana",
-      "quote": "We've lost a lot of trust with NIPSCO. There's a massive outcry right now. The Indiana Utility Regulatory Commission said more than half the complaints it has received so far in 2026 have been about NIPSCO.",
-      "source": "Latitude Media, 'In Indiana, an anatomy of data center opposition'",
-      "date": "2026-03-01"
-    },
-    {
-      "name": "Ben Inskeep",
-      "title": "Program Director",
-      "organization": "Citizens Action Coalition of Indiana",
-      "quote": "2025 marked the highest year-over-year jump in electric bills in two decades, which shows the law isn't working. For example, NIPSCO customers in northwest Indiana are seeing a nearly $50 a month increase.",
-      "source": "Indiana Public Radio / WFYI / WBOI coverage of CAC electric bill analysis",
+      "quote": "Things keep getting worse for Hoosier consumers and our state leaders continue to allow it to happen. Based on this trend, the rhetoric regarding affordability emanating from the Statehouse appears to be nothing more than lip service. Hoosier consumers can no longer afford monopoly pricing. Something must change, soon.",
+      "source": "Indiana Capital Chronicle / Indiana Public Media, reporting on CAC bill analysis",
       "date": "2025-07-24"
     },
     {
-      "name": "Alaina Shonkwiler",
-      "title": "State Representative (R-Noblesville), author of HB 1002",
-      "organization": "Indiana House of Representatives",
-      "quote": "At its core, House Bill 1002 is about balance. It recognizes that Indiana needs strong financial, stable utilities that can invest in the infrastructure, modernize the grid and meet growing demand at the same time.",
-      "source": "WFYI Public Media, HB 1002 committee hearing coverage",
-      "date": "2026-02-10"
+      "name": "Kerwin Olson",
+      "title": "Executive Director",
+      "organization": "Citizens Action Coalition of Indiana",
+      "quote": "I think those customers up there have just sort of experienced the perfect storm. All the money that they spend, they collect from their customers. So they're experiencing the culmination and the pancaking of significant investment with favorable state laws.",
+      "source": "FOX 32 Chicago interview",
+      "date": "2026-03-01"
+    },
+    {
+      "name": "Kerwin Olson",
+      "title": "Executive Director",
+      "organization": "Citizens Action Coalition of Indiana",
+      "quote": "AI data center issues, to us, represent the single biggest threat to consumer affordability as well as climate change today.",
+      "source": "Citizens Action Coalition Citizen Power newsletter, May 2026 / WFIU Noon Edition",
+      "date": "2026-05-01"
+    },
+    {
+      "name": "Ben Inskeep",
+      "title": "Program Director",
+      "organization": "Citizens Action Coalition of Indiana",
+      "quote": "NIPSCO is the poster child for cost shifting from industrial customers on to residential customers. There's a massive outcry right now. We've lost a lot of trust with NIPSCO.",
+      "source": "Latitude Media, reporting on NIPSCO data center proceedings",
+      "date": "2026-03-01"
     },
     {
       "name": "Mike Braun",
       "title": "Governor",
       "organization": "State of Indiana",
-      "quote": "Affordability is why I support Rep. Alaina Shonkwiler's bill to hold investor-owned utility companies accountable to provide affordable energy before they can increase their profit margin. And it's why I appointed three ratepayer-conscious members, now constituting a majority, to the Indiana Utility Regulatory Commission \u2014 to make decisions in the public interest.",
-      "source": "Indiana Capital Chronicle, State of the State speech coverage",
-      "date": "2026-01-23"
+      "quote": "Affordability is why I support Rep. Alaina Shonkwiler's bill to hold investor-owned utility companies accountable to provide affordable energy before they can increase their profit margin. And it's why I appointed three ratepayer-conscious members, now constituting a majority, to the Indiana Utility Regulatory Commission \u2014 to make decisions in the public interest to ensure utilities provide service at just and reasonable rates.",
+      "source": "Governor Braun's 2026 State of the State Address",
+      "date": "2026-01-01"
     },
     {
-      "name": "Jim Pressel",
-      "title": "State Representative (R-Rolling Prairie)",
-      "organization": "Indiana House of Representatives",
-      "quote": "We are now asking the IURC and NIPSCO to review current utility rates and take more consideration of the customers who are struggling to pay their energy bills. (paraphrased from letter to IURC Chair Andy Zay)",
-      "source": "21Alive / WNDU news coverage of letter to IURC",
-      "date": "2026-02-18"
+      "name": "Mike Braun",
+      "title": "Governor",
+      "organization": "State of Indiana",
+      "quote": "I want to strongly praise Chairman Zay and the entire Commission for taking a hard stand and demanding real accountability. They asked the tough questions and made it clear that automatic pass-throughs and unchecked hikes are no longer acceptable. Residential electric rates have climbed 28.9 percent since 2014 \u2014 far outpacing inflation and our peer states.",
+      "source": "WFIE / 14News, reporting on IURC affordability hearing",
+      "date": "2026-03-25"
+    },
+    {
+      "name": "Alaina Shonkwiler",
+      "title": "State Representative (R-Noblesville)",
+      "organization": "Indiana General Assembly",
+      "quote": "Hoosiers are still feeling the financial burden of heating, cooling and lighting their homes. We are updating our regulatory tools so utilities are held accountable for delivering the outcomes we want: strong reliability, improved resilience and better affordability.",
+      "source": "Indiana Capital Chronicle, news conference on HB 1002",
+      "date": "2026-01-08"
+    },
+    {
+      "name": "Vince Parisi",
+      "title": "President and Chief Operating Officer",
+      "organization": "NIPSCO (Northern Indiana Public Service Company)",
+      "quote": "The investments that we make in our system I think are critical. We talk about customer affordability, you have to talk about in the same breath as reliability, resiliency.",
+      "source": "WNDU / Indiana regulators' affordability hearing",
+      "date": "2026-03-24"
     },
     {
       "name": "Brandi Davis-Handy",
       "title": "President",
       "organization": "AES Indiana",
-      "quote": "AES Indiana's residential bills have largely tracked inflation over time. (paraphrased from testimony at March 24, 2026 IURC Investigative Inquiry on Energy Affordability)",
-      "source": "Indiana Capital Chronicle / Northwest Indiana Business Magazine coverage of IURC Inquiry",
+      "quote": "AES Indiana's residential bills have largely tracked inflation over time. (Paraphrased from testimony at the March 24, 2026 IURC affordability hearing.)",
+      "source": "Indiana Capital Chronicle, reporting on the March 24, 2026 IURC hearing",
       "date": "2026-03-24"
     }
   ]
